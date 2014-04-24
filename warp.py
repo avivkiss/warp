@@ -1,7 +1,9 @@
-import argparse
+"""
+This is the main driver script that will run on the client.
+"""
 
-def main():
+def main(remote_host, file_src, file_dest):
   pass
 
 if __name__ == '__main__':
-  main()
+  import plac; plac.call(main)
