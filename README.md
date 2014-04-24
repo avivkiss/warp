@@ -35,12 +35,41 @@ following:
     - Negotiate a port number with the remote host.
     - Run the `server.py` script passing in a cryptographic 
       [nonce](http://en.wikipedia.org/wiki/Cryptographic_nonce), port 
-      number and destination file path.
+      number, file hash and destination file path.
     - Determine based on script output if we are resuming a failed session.
 4. Warp will then attempt to open a TCP connection with the remote host and 
 send over the cryptographic nonce as a form of authentication. 
 5. File transfer will be started.
 
+### Ravioli Code
+There are [many different types](http://en.wikipedia.org/wiki/Spaghetti_code#Related_terms) 
+of code. We all know and love spaghetti code (not really), cringe at the 
+over-engineered Java programmer's lasagna code, and strive for the encapsulated
+functionality of ravioli code. 
+
+Unfortunately, ravioli code is hard to write, so as development progresses the
+overall program structure may change to further fit our dream of encapsulated
+functionality. Until then here is the base structure for this program:
+
+#### handshake.py
+hanshake.py is responsible for creating a secure connection with the remote 
+host. This means starting the SSH session, doing the port negotiation, 
+starting the remote server and ultimately returning a "live" TCP connection.
+
+#### server.py
+server.py is the remote server that is started by the handshake, this is responsible
+for listening for the connection from the client and saving the file 
+accordingly. Further, if a connection fails during a file transfer the server
+should save the file transfer state to disk. Upon reconnecting with the host
+the server should check if it has any of the file that will be transferred
+and if so inform the host of how much data it has successfully saved. The
+server uses a hash of the file sent by the client to determine if it has
+"seen" that file before. 
+
+#### transfer.py
+transfer.py is responsible for chunking and sending the file to the remote host
+in addition it should be able to resume file transfers from a chunk location
+and handle errors correctly.
 
 ### Project Setup
 To install dependencies run `pip install -r requirements.txt`.
