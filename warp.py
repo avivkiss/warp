@@ -4,10 +4,17 @@ This is the main driver script that will run on the client.
 
 import socket, sys
 
+# Just a random chunk size to send the file in pieces,
+# should be the same as the chunk size used to write
+CHUNK_SIZE = 4096
+
 def main(remote_host, file_src, file_dest):
   s = connect_to_server(remote_host)
   f = open(file_src, 'r')
-  sent = s.sendall(f.read())
+  data = f.read(CHUNK_SIZE)
+  while data :
+    s.sendall(data)
+    data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
   s.close()
 
@@ -25,13 +32,13 @@ def connect_to_server(remote_host):
     try:
       s.connect(sa)
     except socket.error as msg:
-      print msg
+      #print msg
       s.close()
       s = None
       continue
     break
   if s is None:
-    print 'could not open socket'
+    print 'Could not connect to', remote_host
     sys.exit(1)
 
   return s

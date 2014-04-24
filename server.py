@@ -6,6 +6,8 @@ two arguments...
 import socket
 import sys
 
+CHUNK_SIZE = 4096
+
 def main(nonce, port, filename):
   """
   Open a port and wait for connection, write to data to filename.
@@ -16,7 +18,7 @@ def main(nonce, port, filename):
 
   print 'Connected by', addr
   while 1:
-    data = conn.recv(1024)
+    data = conn.recv(CHUNK_SIZE)
     ouput_file.write(data)
     if not data: break
 
