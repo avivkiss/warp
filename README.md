@@ -3,10 +3,15 @@ warp
 
 FTL-FTP
 
+### Todo
+make .todo file
+config, global var file,
+tests
+
 ### Introduction
 This readme aims to be both a source of documentation and a development plan
 for the *warp* project. Warp aims to provide fast file transfer over UDT. 
-The project will be implemented in Python and at the moment using TCP.
+The project will be implemented in Python 2.7 and at the moment using TCP.
 
 Eventually TCP will be swapped out and replaced with something like 
 [pyUDT](https://github.com/cjhanks/PyUDT). The original pyUDT has not been 
@@ -21,7 +26,8 @@ the capability to resume failed transfers.
 ### Protocol - a high level overview
 Before going into the details of the handshake and initiation protocol some
 terminology needs to be clarified. In the following description the 
-"client" will be sending a file to the "server". At at a later point in time, perhaps at the CLI stage but more likely at the GUI stage the "client" will 
+"client" will be sending a file to the "server". At at a later point in time,
+perhaps at the CLI stage but more likely at the GUI stage the "client" will 
 also be able to pull a file off the server.
 
 In order to initiate a file transfer the following steps will be taken:
