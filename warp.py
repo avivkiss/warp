@@ -9,11 +9,11 @@ from config import *
 from handshake import handshake
 
 def main(remote_host, file_src, file_dest):
-  username, hostname, port = unpack_remote_host(remote_host)
-  handshake(username, hostname, port)
+  username, hostname, ssh_port = unpack_remote_host(remote_host)
+  handshake(username, hostname, ssh_port)
 
-def send_data(remote_host, file_src, file_dest):
-  s = connect_to_server(remote_host)
+def send_data(remote_host, file_src, file_dest, tcp_port):
+  s = connect_to_server(remote_host, tcp_port)
   f = open(file_src, 'r')
   data = f.read(CHUNK_SIZE)
   while data :
@@ -44,11 +44,11 @@ def unpack_remote_host(remote_host):
   return (username, hostname, port)
 
 
-def connect_to_server(remote_host):
-  HOST = remote_host    # The remote host
-  PORT = 54321              # random port number, will be changed
+def connect_to_server(remote_host, port):
+  host = remote_host        # The remote host
+
   s = None
-  for res in socket.getaddrinfo(HOST, PORT, socket.AF_UNSPEC, socket.SOCK_STREAM):
+  for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
     af, socktype, proto, canonname, sa = res
     try:
       s = socket.socket(af, socktype, proto)

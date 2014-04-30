@@ -1,5 +1,5 @@
 # For now global variables and configuration will be stored in this file.
-# In the future\ consider moving some of this to a "non-executable"
+# In the future consider moving some of this to a "non-executable"
 # configuration file.
 
 # Just a random chunk size to send the file in pieces,

@@ -7,6 +7,10 @@ hostkeytype = None
 hostkey = None
 
 def handshake(username, hostname, port=22, password=None):
+  """
+  Goal of the handshake is to return an authed TCP connection. Expects
+  executable for alias warp
+  """
   try:
     client = SSHClient()
     client.load_system_host_keys()
