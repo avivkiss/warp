@@ -5,7 +5,6 @@ FTL-FTP
 
 ### Todo
 make .todo file
-config, global var file,
 tests
 
 ### Introduction
@@ -76,6 +75,10 @@ server uses a hash of the file sent by the client to determine if it has
 transfer.py is responsible for chunking and sending the file to the remote host
 in addition it should be able to resume file transfers from a chunk location
 and handle errors correctly.
+
+#### config.py
+This is a file that will store our global vars, in the future we can expand 
+this to read in config from a configuration file.
 
 ### Project Setup
 To install dependencies run `pip install -r requirements.txt`.

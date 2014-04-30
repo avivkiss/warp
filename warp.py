@@ -3,10 +3,7 @@ This is the main driver script that will run on the client.
 """
 
 import socket, sys
-
-# Just a random chunk size to send the file in pieces,
-# should be the same as the chunk size used to write
-CHUNK_SIZE = 4096
+from config import *
 
 def main(remote_host, file_src, file_dest):
   s = connect_to_server(remote_host)

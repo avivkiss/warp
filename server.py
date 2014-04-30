@@ -5,8 +5,7 @@ two arguments...
 
 import socket
 import sys
-
-CHUNK_SIZE = 4096
+from config import *
 
 def main(nonce, port, filename):
   """
