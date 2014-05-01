@@ -39,8 +39,7 @@ that authentication is done with an ssh-agent. The script will then do the
 following:
     - Negotiate a port number with the remote host.
     - Run the `server.py` script passing in a cryptographic 
-      [nonce](http://en.wikipedia.org/wiki/Cryptographic_nonce), port 
-      number, file hash and destination file path.
+      [nonce](http://en.wikipedia.org/wiki/Cryptographic_nonce), file hash and destination file path. The script will return the port number. 
     - Determine based on script output if we are resuming a failed session.
 4. Warp will then attempt to open a TCP connection with the remote host and 
 send over the cryptographic nonce as a form of authentication. 

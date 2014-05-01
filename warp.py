@@ -4,16 +4,21 @@
 This is the main driver script that will run on the client.
 """
 
-import socket, sys
+import socket, sys, random
 from config import *
 from handshake import handshake
 
 def main(remote_host, file_src, file_dest):
   username, hostname, ssh_port = unpack_remote_host(remote_host)
-  handshake(username, hostname, ssh_port)
+  nonce = generate_nonce();
+  port = handshake(username=username, hostname=hostname, nonce=nonce, file_dest=file_dest)
 
-def send_data(remote_host, file_src, file_dest, tcp_port):
-  s = connect_to_server(remote_host, tcp_port)
+  print port, hostname
+
+  send_data(hostname, file_src, file_dest, port)
+
+def send_data(hostname, file_src, file_dest, tcp_port):
+  s = connect_to_server(hostname, tcp_port)
   f = open(file_src, 'r')
   data = f.read(CHUNK_SIZE)
   while data :
@@ -21,6 +26,10 @@ def send_data(remote_host, file_src, file_dest, tcp_port):
     data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
   s.close()
+
+def generate_nonce(length=8):
+    """Generate pseudorandom number. Ripped from google."""
+    return ''.join([str(random.randint(0, 9)) for i in range(length)])
 
 def unpack_remote_host(remote_host):
   """
@@ -44,11 +53,10 @@ def unpack_remote_host(remote_host):
   return (username, hostname, port)
 
 
-def connect_to_server(remote_host, port):
-  host = remote_host        # The remote host
-
+def connect_to_server(host_name, port):
   s = None
-  for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+
+  for res in socket.getaddrinfo(host_name, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
     af, socktype, proto, canonname, sa = res
     try:
       s = socket.socket(af, socktype, proto)
@@ -64,7 +72,7 @@ def connect_to_server(remote_host, port):
       continue
     break
   if s is None:
-    print 'Could not connect to', remote_host
+    print 'Could not connect to', host_name
     sys.exit(1)
 
   return s

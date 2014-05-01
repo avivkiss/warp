@@ -1,12 +1,13 @@
 
-import sys
+import sys, traceback
 from config import *
 from paramiko import SSHClient
+from time import sleep
 
 hostkeytype = None
 hostkey = None
 
-def handshake(username, hostname, port=22, password=None):
+def handshake(username, hostname, nonce, file_dest, port=22, password=None):
   """
   Goal of the handshake is to return an authed TCP connection. Expects
   executable for alias warp
@@ -15,8 +16,11 @@ def handshake(username, hostname, port=22, password=None):
     client = SSHClient()
     client.load_system_host_keys()
     client.connect(hostname, username=username, port=port)
-    stdin, stdout, stderr = client.exec_command('ls -l')
-    print stdout.read()
+    stdin, stdout, stderr = client.exec_command('warp ' + str(nonce) + ' ' + file_dest)
+    
+    # TODO error checking
+
+    return int(stdout.readline())
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
