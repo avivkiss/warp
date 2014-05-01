@@ -4,16 +4,17 @@
 This is the main driver script that will run on the client.
 """
 
-import socket, sys, hashlib, random
+import socket, sys, hashlib, random, os.path
 from config import *
 from handshake import handshake
 
 def main(remote_host, file_src, file_dest):
   username, hostname, ssh_port = unpack_remote_host(remote_host)
-  nonce = generate_nonce();
+  nonce = generate_nonce()
   hash = getHash(file_src)
   # handshake should be returning a tuple, port and numblocks TODO
-  port = handshake(username=username, hostname=hostname, nonce=nonce, file_dest=file_dest, hash=hash)
+  port = handshake(username=username, hostname=hostname, nonce=nonce, \
+    file_dest=file_dest, hash=hash, file_size=os.path.getsize(file_src))
 
   print port, hostname
 

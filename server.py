@@ -12,7 +12,7 @@ import sys
 import os.path
 from config import *
 
-def main(nonce, filepath, hash):
+def main(nonce, filepath, hash, file_size):
   """
   Open a port and wait for connection, write to data to filename.
   """
@@ -52,13 +52,20 @@ def main(nonce, filepath, hash):
 
   print 'Connected by', addr
   i = block_count
+  size = block_count * CHUNK_SIZE
   while 1:
     data = conn.recv(CHUNK_SIZE)
     output_file.write(data)
+    size = size + len(data)
     if len(data) != CHUNK_SIZE: break
     else: i = i + 1
 
-  history[hash]['block_count'] = i
+  if str(size) == file_size:
+    print "finished"
+    del history[hash]
+  else:
+    history[hash]['block_count'] = i
+
   with open(TRANSACTION_HISTORY_FILENAME, "w") as f:
     json.dump(history, f)
     f.close()

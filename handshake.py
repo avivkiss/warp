@@ -7,7 +7,7 @@ from time import sleep
 hostkeytype = None
 hostkey = None
 
-def handshake(username, hostname, nonce, file_dest, hash, port=22, password=None):
+def handshake(username, hostname, nonce, file_dest, hash, file_size, port=22, password=None):
   """
   Goal of the handshake is to return an authed TCP connection. Expects
   executable for alias warp, for now will return (port, block_count) tuple.
@@ -16,7 +16,7 @@ def handshake(username, hostname, nonce, file_dest, hash, port=22, password=None
     client = SSHClient()
     client.load_system_host_keys()
     client.connect(hostname, username=username, port=port)
-    stdin, stdout, stderr = client.exec_command('warp ' + str(nonce) + ' ' + file_dest)
+    stdin, stdout, stderr = client.exec_command('warp ' + str(nonce) + ' ' + file_dest + ' ' + str(file_size))
     
     # TODO error checking
 
