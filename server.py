@@ -21,33 +21,34 @@ def main(nonce, filename, hash):
 
   print port
 
-  # TODO: this only stores one hash in the config file, it should read the old
-  # config file then add too it
+  # TODO: this only stores one hash in the history file, it should read the old
+  # history file then add too it
 
   # determine the number of block already read by looking in json file
-  numblocks = 0
-  if os.path.isfile("config"):
-    config_file = open("config", "r")
-    config = json.load(config_file)
-    if hash in config:
-      numblocks = config[hash]['numblocks']
+  blocks = 0
+  if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
+    history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
+    history = json.load(history_file)
+    if hash in history:
+      blocks = history[hash]['blocks']
 
-  print numblocks
+  print blocks
 
   conn, addr = sock.accept()
   
   output_file = open(filename, "r+")
-  output_file.seek(numblocks * CHUNK_SIZE)
+  output_file.seek(blocks * CHUNK_SIZE)
 
   print 'Connected by', addr
-  i = numblocks
+  i = blocks
   while 1:
     data = conn.recv(CHUNK_SIZE)
     output_file.write(data)
     i = i + 1
-    dict = {hash : {"numblocks" : i}}
-    json.dump(dict, open("config", "w"))
     if not data: break
+
+  dict = {hash : {"blocks" : i}}
+  json.dump(dict, open(TRANSACTION_HISTORY_FILENAME, "w"))
 
   output_file.close()
   conn.close()
