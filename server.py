@@ -50,7 +50,7 @@ def get_socket():
   except socket.error as msg:
     s.close()
     print msg
-    sock_fail
+    sock_fail()
 
   return s
 
