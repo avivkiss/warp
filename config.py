@@ -5,4 +5,4 @@
 # Just a random chunk size to send the file in pieces,
 # should be the same as the chunk size used to write
 CHUNK_SIZE = 4096
-TRANSACTION_HISTORY_FN = "transaction_history.warp"
+TRANSACTION_HISTORY_FILENAME = "transaction_history.warp"
