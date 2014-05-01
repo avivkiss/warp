@@ -53,10 +53,8 @@ def main(nonce, filepath, hash):
   output_file.close()
   conn.close()
 
-  # TODO: possibly remove the dictionary from the history file once the
-
-   # transfer is successful *** Noah I am not sure what this line was supposed
-   #                        *** so I commented it out.
+  # TODO: possibly remove the dictionary from the history file once the transfer
+  # is successful
 
 def get_socket():
   """
