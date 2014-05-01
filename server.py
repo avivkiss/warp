@@ -44,8 +44,8 @@ def main(nonce, filepath, hash):
   while 1:
     data = conn.recv(CHUNK_SIZE)
     output_file.write(data)
-    i = i + 1
-    if not data: break
+    if len(data) != CHUNK_SIZE: break
+    else: i = i + 1
 
   dict = {hash : {"block_count" : i}}
   json.dump(dict, open(TRANSACTION_HISTORY_FILENAME, "w"))
