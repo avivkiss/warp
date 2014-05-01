@@ -12,7 +12,7 @@ import sys
 import os.path
 from config import *
 
-def main(nonce, filename, hash):
+def main(nonce, filepath, hash):
   """
   Open a port and wait for connection, write to data to filename.
   """
@@ -36,7 +36,7 @@ def main(nonce, filename, hash):
 
   conn, addr = sock.accept()
   
-  output_file = open(filename, "r+")
+  output_file = open(filepath, "r+")
   output_file.seek(block_count * CHUNK_SIZE)
 
   print 'Connected by', addr
