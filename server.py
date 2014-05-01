@@ -21,23 +21,34 @@ def main(nonce, filepath, hash):
 
   print port
 
-  # TODO: this only stores one hash in the history file, it should read the old
-  # history file then add too it
+  history = {}
 
   # determine the number of block already read by looking in json file
   block_count = 0
   if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
     history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
     history = json.load(history_file)
+    history_file.close()
     if hash in history:
       block_count = history[hash]['block_count']
+
+  # If the outfile does not exist, block_count should be 0 for now, eventually store
+  # the location of the previous file and copy it over
+  # This overwrites the output file even if it already exists
+  if os.path.isfile(filepath) and block_count>0:
+    output_file = open(filepath, "r+")
+  else:
+    output_file = open(filepath, "w")
+    block_count = 0
 
   print block_count
 
   conn, addr = sock.accept()
   
-  output_file = open(filepath, "r+")
   output_file.seek(block_count * CHUNK_SIZE)
+
+  if hash not in history:
+    history[hash] = {'block_count' : 0}
 
   print 'Connected by', addr
   i = block_count
@@ -47,14 +58,15 @@ def main(nonce, filepath, hash):
     if len(data) != CHUNK_SIZE: break
     else: i = i + 1
 
-  dict = {hash : {"block_count" : i}}
-  json.dump(dict, open(TRANSACTION_HISTORY_FILENAME, "w"))
+  history[hash]['block_count'] = i
+  with open(TRANSACTION_HISTORY_FILENAME, "w") as f:
+    json.dump(history, f)
+    f.close()
 
   output_file.close()
   conn.close()
 
-  # TODO: possibly remove the dictionary from the history file once the transfer
-  # is successful
+  # TODO: if the full file size has been written, remove the hash from the config file
 
 def get_socket():
   """
