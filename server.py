@@ -7,10 +7,11 @@ two arguments...
 """
 
 import socket
+import json
 import sys
 from config import *
 
-def main(nonce, filename):
+def main(nonce, filename, hash):
   """
   Open a port and wait for connection, write to data to filename.
   """
@@ -19,7 +20,7 @@ def main(nonce, filename):
 
   print port
 
-  conn, addr = sock.accept() 
+  conn, addr = sock.accept()
   
   ouput_file = open(filename, 'w')
 

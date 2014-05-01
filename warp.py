@@ -4,13 +4,14 @@
 This is the main driver script that will run on the client.
 """
 
-import socket, sys
+import socket, sys, hashlib
 from config import *
 from handshake import handshake
 
 def main(remote_host, file_src, file_dest):
   username, hostname, ssh_port = unpack_remote_host(remote_host)
-  handshake(username, hostname, ssh_port)
+  hash = getHash(file_src)
+  handshake(username, hostname, hash, ssh_port)
 
 def send_data(remote_host, file_src, file_dest, tcp_port):
   s = connect_to_server(remote_host, tcp_port)
@@ -21,6 +22,19 @@ def send_data(remote_host, file_src, file_dest, tcp_port):
     data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
   s.close()
+
+def getHash(file):
+    """
+    Returns a sha256 hash for the specified file.
+    Eventually sent to server to check for restarts.
+    """
+    hash = hashlib.sha256()
+    with open(file, "r") as file:
+        while True:
+            data = file.read(CHUNK_SIZE)
+            if not data:
+                return hash.hexdigest()
+        hash.update(data)
 
 def unpack_remote_host(remote_host):
   """

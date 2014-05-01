@@ -6,7 +6,7 @@ from paramiko import SSHClient
 hostkeytype = None
 hostkey = None
 
-def handshake(username, hostname, port=22, password=None):
+def handshake(username, hostname, hash, port=22, password=None):
   """
   Goal of the handshake is to return an authed TCP connection. Expects
   executable for alias warp
