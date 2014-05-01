@@ -25,35 +25,38 @@ def main(nonce, filename, hash):
   # history file then add too it
 
   # determine the number of block already read by looking in json file
-  blocks = 0
+  block_count = 0
   if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
     history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
     history = json.load(history_file)
     if hash in history:
-      blocks = history[hash]['blocks']
+      block_count = history[hash]['block_count']
 
-  print blocks
+  print block_count
 
   conn, addr = sock.accept()
   
   output_file = open(filename, "r+")
-  output_file.seek(blocks * CHUNK_SIZE)
+  output_file.seek(block_count * CHUNK_SIZE)
 
   print 'Connected by', addr
-  i = blocks
+  i = block_count
   while 1:
     data = conn.recv(CHUNK_SIZE)
     output_file.write(data)
     i = i + 1
     if not data: break
 
-  dict = {hash : {"blocks" : i}}
+  dict = {hash : {"block_count" : i}}
   json.dump(dict, open(TRANSACTION_HISTORY_FILENAME, "w"))
 
   output_file.close()
   conn.close()
 
-  # TODO: possibly remove the dictionary from the config file once the transfer is successful
+  # TODO: possibly remove the dictionary from the history file once the
+
+   # transfer is successful *** Noah I am not sure what this line was supposed
+   #                        *** so I commented it out.
 
 def get_socket():
   """

@@ -10,7 +10,7 @@ hostkey = None
 def handshake(username, hostname, nonce, file_dest, hash, port=22, password=None):
   """
   Goal of the handshake is to return an authed TCP connection. Expects
-  executable for alias warp
+  executable for alias warp, for now will return (port, block_count) tuple.
   """
   try:
     client = SSHClient()
