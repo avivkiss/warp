@@ -4,14 +4,15 @@
 This is the main driver script that will run on the client.
 """
 
-import socket, sys, random
+import socket, sys, hashlib, random
 from config import *
 from handshake import handshake
 
 def main(remote_host, file_src, file_dest):
   username, hostname, ssh_port = unpack_remote_host(remote_host)
   nonce = generate_nonce();
-  port = handshake(username=username, hostname=hostname, nonce=nonce, file_dest=file_dest)
+  hash = getHash(file_src)
+  port = handshake(username=username, hostname=hostname, nonce=nonce, file_dest=file_dest, hash=hash)
 
   print port, hostname
 
@@ -28,8 +29,21 @@ def send_data(hostname, file_src, file_dest, tcp_port):
   s.close()
 
 def generate_nonce(length=8):
-    """Generate pseudorandom number. Ripped from google."""
-    return ''.join([str(random.randint(0, 9)) for i in range(length)])
+   """Generate pseudorandom number. Ripped from google."""
+  return ''.join([str(random.randint(0, 9)) for i in range(length)])
+
+def getHash(file):
+    """
+    Returns a sha256 hash for the specified file.
+    Eventually sent to server to check for restarts.
+    """
+    hash = hashlib.sha256()
+    with open(file, "r") as file:
+        while True:
+            data = file.read(CHUNK_SIZE)
+            if not data:
+                return hash.hexdigest()
+        hash.update(data)
 
 def unpack_remote_host(remote_host):
   """
