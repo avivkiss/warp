@@ -12,15 +12,17 @@ def main(remote_host, file_src, file_dest):
   username, hostname, ssh_port = unpack_remote_host(remote_host)
   nonce = generate_nonce();
   hash = getHash(file_src)
+  # handshake should be returning a tuple, port and numblocks
   port = handshake(username=username, hostname=hostname, nonce=nonce, file_dest=file_dest, hash=hash)
 
   print port, hostname
 
   send_data(hostname, file_src, file_dest, port)
 
-def send_data(hostname, file_src, file_dest, tcp_port):
+def send_data(hostname, file_src, file_dest, tcp_port, numblocks = 0):
   s = connect_to_server(hostname, tcp_port)
   f = open(file_src, 'r')
+  f.seek(numblocks * CHUNK_SIZE)
   data = f.read(CHUNK_SIZE)
   while data :
     s.sendall(data)
@@ -42,6 +44,7 @@ def getHash(file):
     while True:
       data = file.read(CHUNK_SIZE)
       if not data:
+        file.close()
         return hash.hexdigest()
       hash.update(data)
 

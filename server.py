@@ -9,6 +9,7 @@ two arguments...
 import socket
 import json
 import sys
+import os.path
 from config import *
 
 def main(nonce, filename, hash):
@@ -20,18 +21,38 @@ def main(nonce, filename, hash):
 
   print port
 
+  # TODO: this only stores one hash in the config file, it should read the old
+  # config file then add too it
+
+  # determine the number of block already read by looking in json file
+  numblocks = 0
+  if os.path.isfile("config"):
+    config_file = open("config", "r")
+    config = json.load(config_file)
+    if hash in config:
+      numblocks = config[hash]['numblocks']
+
+  print numblocks
+
   conn, addr = sock.accept()
   
-  ouput_file = open(filename, 'w')
+  output_file = open(filename, "r+")
+  output_file.seek(numblocks * CHUNK_SIZE)
 
   print 'Connected by', addr
+  i = numblocks
   while 1:
     data = conn.recv(CHUNK_SIZE)
-    ouput_file.write(data)
+    output_file.write(data)
+    i = i + 1
+    dict = {hash : {"numblocks" : i}}
+    json.dump(dict, open("config", "w"))
     if not data: break
 
-  ouput_file.close()
+  output_file.close()
   conn.close()
+
+  # TODO: possibly remove the dictionary from the config file once the transfer is successful
 
 def get_socket():
   """
