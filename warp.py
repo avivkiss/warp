@@ -19,9 +19,9 @@ def main(remote_host, file_src, file_dest):
 
   print port, hostname
 
-  send_data(hostname, file_src, file_dest, port)
+  send_data(hostname, file_src, port)
 
-def send_data(hostname, file_src, file_dest, tcp_port, numblocks = 0):
+def send_data(hostname, file_src, tcp_port, numblocks = 0):
   s = connect_to_server(hostname, tcp_port)
   f = open(file_src, 'r')
   f.seek(numblocks * CHUNK_SIZE)
