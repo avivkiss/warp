@@ -1,5 +1,5 @@
 
-import sys, traceback
+import sys, traceback, socket, StringIO
 from config import *
 from paramiko import SSHClient
 from time import sleep
@@ -32,4 +32,5 @@ def handshake(username, hostname, nonce, file_dest, hash, file_size, port=22, pa
     except:
       pass
     sys.exit(1)
+
 
