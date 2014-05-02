@@ -13,8 +13,9 @@ def main(remote_host, file_src, file_dest):
   nonce = generate_nonce()
   hash = getHash(file_src)
   # handshake should be returning a tuple, port and numblocks TODO
-  port = handshake(username=username, hostname=hostname, nonce=nonce, \
-    file_dest=file_dest, hash=hash, file_size=os.path.getsize(file_src))
+  port, block_count = handshake(username=username, hostname=hostname, \
+    nonce=nonce, file_dest=file_dest, hash=hash, \
+    file_size=os.path.getsize(file_src))
 
   print port, hostname
 

@@ -1,8 +1,7 @@
 
-import sys, traceback, socket, StringIO
+import sys, traceback
 from config import *
 from paramiko import SSHClient
-from time import sleep
 
 hostkeytype = None
 hostkey = None
@@ -11,16 +10,25 @@ def handshake(username, hostname, nonce, file_dest, hash, file_size, port=22, pa
   """
   Goal of the handshake is to return an authed TCP connection. Expects
   executable for alias warp, for now will return (port, block_count) tuple.
+  Executable must be in the default path.
   """
   try:
     client = SSHClient()
     client.load_system_host_keys()
     client.connect(hostname, username=username, port=port)
-    stdin, stdout, stderr = client.exec_command('warp ' + str(nonce) + ' ' + file_dest + ' ' + str(file_size))
+    stdin, stdout, stderr = client.exec_command('warp ' + str(nonce) + ' ' +
+     file_dest + ' ' + str(hash) + ' ' + str(file_size))
     
     # TODO error checking
+    print "stuck here"
 
-    return int(stdout.readline())
+    
+    port = stdout.readline()
+    print port
+    block_count = stdout.readline()
+    print block_count
+
+    return (port, block_count)
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
