@@ -25,17 +25,26 @@ def main(nonce, filepath, hash, file_size):
 
   # determine the number of block already read by looking in json file
   block_count = 0
+  old_path = ""
   if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
     history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
     history = json.load(history_file)
     history_file.close()
     if hash in history:
-      block_count = history[hash]['block_count']
+      old_path = history[hash]['path']
 
-  # If the outfile does not exist, block_count should be 0 for now, eventually store
-  # the location of the previous file and copy it over
-  # This overwrites the output file even if it already exists
-  if os.path.isfile(filepath) and block_count>0:
+  (head, tail) = os.path.split(filepath)
+  if not tail:
+    print "must specify a file"
+    return
+
+  if head != "" and not os.path.exists(head):
+      os.makedirs(head)
+
+  # TODO: If old path is not the same as the new path, this should copy
+  # it to the new path
+  if old_path != "" and os.path.samefile(old_path, filepath):
+    block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
     output_file = open(filepath, "r+")
   else:
     output_file = open(filepath, "w")
@@ -43,12 +52,18 @@ def main(nonce, filepath, hash, file_size):
 
   print block_count
 
+  if hash not in history:
+    history[hash] = {'path' : filepath}
+
+  # At this point we have created the new file so the transaction
+  # history should be updated
+  with open(TRANSACTION_HISTORY_FILENAME, "w") as f:
+    json.dump(history, f)
+    f.close()
+
   conn, addr = sock.accept()
   
   output_file.seek(block_count * CHUNK_SIZE)
-
-  if hash not in history:
-    history[hash] = {'block_count' : 0}
 
   print 'Connected by', addr
   i = block_count
@@ -63,17 +78,14 @@ def main(nonce, filepath, hash, file_size):
   if str(size) == file_size:
     print "finished"
     del history[hash]
-  else:
-    history[hash]['block_count'] = i
 
+  # Write the new history that does not include this transfer
   with open(TRANSACTION_HISTORY_FILENAME, "w") as f:
     json.dump(history, f)
     f.close()
 
   output_file.close()
   conn.close()
-
-  # TODO: if the full file size has been written, remove the hash from the config file
 
 def get_socket():
   """
