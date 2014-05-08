@@ -6,7 +6,7 @@
 import logging
 
 LOG_LEVEL = logging.DEBUG
-logging.basicConfig(format='%(levelname)s:%(message)s', level=LOG_LEVEL)
+logging.basicConfig(format='%(levelname)s: %(message)s', level=LOG_LEVEL)
 
 # Just a random chunk size to send the file in pieces,
 # should be the same as the chunk size used to write
