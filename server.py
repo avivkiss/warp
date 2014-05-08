@@ -38,7 +38,8 @@ def main(nonce, filepath, file_hash, file_size):
   write_history(history)
 
   conn, addr = sock.accept()
-  size = recieve_data(conn, output_file, block_count, addr)
+  logger.info('Connected by %s', addr)
+  size = recieve_data(conn, output_file, block_count)
   
   if str(size) == file_size:
     logger.info("finished")
@@ -50,14 +51,13 @@ def main(nonce, filepath, file_hash, file_size):
   output_file.close()
   conn.close()
 
-def recieve_data(conn, output_file, block_count, addr):
+def recieve_data(conn, output_file, block_count):
   """m
   Receives data and writes it to disk, stops when it is no longer receiving 
   data.
   """
   output_file.seek(block_count * CHUNK_SIZE)
 
-  logger.info('Connected by %s', addr)
   i = block_count
   size = block_count * CHUNK_SIZE
   while 1:
