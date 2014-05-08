@@ -7,7 +7,6 @@ import logging
 
 LOG_LEVEL = logging.DEBUG
 logging.basicConfig(format='%(levelname)s:%(message)s', level=LOG_LEVEL)
-logger = logging.getLogger('warp')
 
 # Just a random chunk size to send the file in pieces,
 # should be the same as the chunk size used to write
@@ -26,3 +25,4 @@ def get_file_logger(logger_name, filename="warp.log"):
 
   return l
 
+logger = get_file_logger('warp')
