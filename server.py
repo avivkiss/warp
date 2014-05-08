@@ -65,7 +65,6 @@ def recieve_data(conn, output_file, block_count):
     output_file.write(data)
     size = size + len(data)
     if len(data) != CHUNK_SIZE: break
-    else: i = i + 1
 
   return size
 
