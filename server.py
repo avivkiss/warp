@@ -30,7 +30,7 @@ def main(nonce, filepath, file_hash, file_size):
   block_count, output_file = get_file_and_state(filepath, old_path)
   print block_count
 
-  background()
+  # background()
     
   if file_hash not in history:
     history[file_hash] = {'path' : filepath}
@@ -38,7 +38,7 @@ def main(nonce, filepath, file_hash, file_size):
   write_history(history)
 
   conn, addr = sock.accept()
-  size = recieve_data(conn, output_file, block_count)
+  size = recieve_data(conn, output_file, block_count, addr)
   
   if str(size) == file_size:
     logger.info("finished")
@@ -50,8 +50,8 @@ def main(nonce, filepath, file_hash, file_size):
   output_file.close()
   conn.close()
 
-def recieve_data(conn, output_file, block_count):
-  """
+def recieve_data(conn, output_file, block_count, addr):
+  """m
   Receives data and writes it to disk, stops when it is no longer receiving 
   data.
   """

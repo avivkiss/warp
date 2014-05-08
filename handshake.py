@@ -19,8 +19,11 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
     client = SSHClient()
     client.load_system_host_keys()
     client.connect(hostname, username=username, port=port)
-    stdin, stdout, stderr = client.exec_command('warp ' + str(nonce) + ' ' +
-     file_dest + ' ' + str(file_hash) + ' ' + str(file_size))
+    command = 'warp ' + str(nonce) + ' ' + \
+     file_dest + ' ' + str(file_hash) + ' ' + str(file_size)
+    stdin, stdout, stderr = client.exec_command(command)
+
+    logging.debug("Command to server is: %s", command)
     
     # TODO error checking
     # print stdout.read()
