@@ -4,6 +4,9 @@
 """
 This is the server script that will be started by client over SSH, it takes 
 two arguments...
+
+TODO:
+For some reason when this script is executed over SSH logging is not working.
 """
 
 from config import *
@@ -13,7 +16,7 @@ import sys
 import os.path
 import shutil
 
-def main(nonce, filepath, hash, file_size):
+def main(nonce, filepath, file_hash, file_size):
   """
   Open a port and wait for connection, write to data to filename.
   """
@@ -22,51 +25,20 @@ def main(nonce, filepath, hash, file_size):
 
   print port
 
-  history = {}
+  old_path, history = get_old_filepath(file_hash)
 
-  # determine the number of block already read by looking in json file
-  block_count = 0
-  old_path = ""
-  if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
-    history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
-    history = json.load(history_file)
-    history_file.close()
-    if hash in history:
-      old_path = history[hash]['path']
+  validate_filepath(filepath)
 
-  (head, tail) = os.path.split(filepath)
-  if not tail:
-    # putting this through the logger because at this point the server
-    # is headless and the user will not see the message, TODO add support for
-    # this message in warp.py
-    logger.error("must specify a valid file path")
-    sys.exit()
-
-  if head != "" and not os.path.exists(head):
-      os.makedirs(head)
-
-  if old_path != "":
-    block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
-    if not os.path.isfile(filepath) or not os.path.samefile(old_path, filepath):
-      output_file = open(filepath, "w")
-      shutil.copyfile(old_path, filepath)
-    else:
-      output_file = open(filepath, "r+")
-  else:
-    output_file = open(filepath, "w")
-    block_count = 0
+  block_count, output_file = get_file_and_state(filepath, old_path)
 
   print block_count
 
   # background self
-  logging.info("About to background:")
   if os.fork():
-    logging.info("Backgrounded:")
     sys.exit()
     
-  logging.info("Resuming:")
-  if hash not in history:
-    history[hash] = {'path' : filepath}
+  if file_hash not in history:
+    history[file_hash] = {'path' : filepath}
 
   # At this point we have created the new file so the transaction
   # history should be updated
@@ -90,15 +62,65 @@ def main(nonce, filepath, hash, file_size):
 
   if str(size) == file_size:
     logger.info("finished")
-    del history[hash]
+    del history[file_hash]
 
   # Write the new history that does not include this transfer
   with open(TRANSACTION_HISTORY_FILENAME, "w") as f:
     json.dump(history, f)
     f.close()
 
-  output_file.close()
+  output_file.close(file_hash)
   conn.close()
+
+def get_file_and_state(filepath, old_path):
+  """
+  Opens a file object and checks and returns that along with the block count
+  on the file.
+  """
+
+  block_count = 0
+  if old_path:
+    block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
+    if not os.path.isfile(filepath) or not os.path.samefile(old_path, filepath):
+      output_file = open(filepath, "w")
+      shutil.copyfile(old_path, filepath)
+    else:
+      output_file = open(filepath, "r+")
+  else:
+    output_file = open(filepath, "w")
+    block_count = 0
+
+  return block_count, output_file
+
+def validate_filepath(filepath):
+  """
+  Validates the filepath, and creates the path if it does not exist. 
+  """
+  (head, tail) = os.path.split(filepath)
+  if not tail:
+    # TODO add error support for warp.py
+    logger.error("must specify a valid file path")
+    sys.exit()
+
+  if head != "" and not os.path.exists(head):
+    os.makedirs(head)
+
+def get_old_filepath(file_hash):
+  """
+  Checks the history file to see if there is a hash of this file in the history
+  and then gets that returns that path from the JSON file. If there is no
+  record of the file None is returned. 
+  """
+  old_path = None
+  history  = {}
+  if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
+    history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
+    history = json.load(history_file)
+    history_file.close()
+    if file_hash in history:
+      old_path = history[file_hash]['path']
+
+  return old_path, history
 
 def get_socket():
   """
