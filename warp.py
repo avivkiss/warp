@@ -4,8 +4,8 @@
 This is the main driver script that will run on the client.
 """
 
-import socket, sys, hashlib, random, os.path
 from config import *
+import socket, sys, hashlib, random, os.path
 from handshake import handshake
 
 def main(remote_host, file_src, file_dest):

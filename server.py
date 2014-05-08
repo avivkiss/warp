@@ -6,12 +6,12 @@ This is the server script that will be started by client over SSH, it takes
 two arguments...
 """
 
+from config import *
 import socket
 import json
 import sys
 import os.path
 import shutil
-from config import *
 
 # setup logging, headless server should log to file...
 logger = get_file_logger("warp_server")
