@@ -14,7 +14,7 @@ import shutil
 from config import *
 
 # setup logging, headless server should log to file...
-logging.basicConfig(filename='warp.log',level=logging.DEBUG)
+logging.basicConfig(filename='warp.log',filemode='a',level=logging.DEBUG)
 
 
 def main(nonce, filepath, hash, file_size):

@@ -25,17 +25,16 @@ def handshake(username, hostname, nonce, file_dest, hash, file_size, port=22, pa
     # TODO error checking
     # print stdout.read()
 
-    port = stdout.readline()
-    print "port: ", port
-    block_count = stdout.readline()
-    print "block count: ", block_count
+    port = stdout.readline().strip()
+    block_count = stdout.readline().strip()
+    logging.info("port: %s, block count: %s", port.cho, block_count)
 
     return (int(port), int(block_count))
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
     # Eventually we should log this and have a user friendly message.
-    print('*** Caught exception: %s: %s' % (e.__class__, e))
+    logging.error('*** Caught exception: %s: %s', e.__class__, e)
     traceback.print_exc()
     try:
       t.close()
