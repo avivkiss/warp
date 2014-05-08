@@ -19,7 +19,10 @@ def get_file_logger(logger_name, filename="warp.log"):
   l = logging.getLogger(logger_name)
   fh = logging.FileHandler(filename)
   fh.setLevel(LOG_LEVEL)
+  formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+  fh.setFormatter(formatter)
   l.setLevel(LOG_LEVEL)
   l.addHandler(fh)
 
   return l
+
