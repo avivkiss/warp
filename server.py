@@ -14,7 +14,7 @@ import os.path
 import shutil
 
 # setup logging, headless server should log to file...
-logger = get_file_logger("warp_server")
+file_logger = get_file_logger("warp_server")
 
 def main(nonce, filepath, hash, file_size):
   """
@@ -42,7 +42,7 @@ def main(nonce, filepath, hash, file_size):
     # putting this through the logger because at this point the server
     # is headless and the user will not see the message, TODO add support for
     # this message in warp.py
-    logger.error("must specify a valid file path")
+    file_logger.error("must specify a valid file path")
     sys.exit()
 
   if head != "" and not os.path.exists(head):
@@ -77,7 +77,7 @@ def main(nonce, filepath, hash, file_size):
   
   output_file.seek(block_count * CHUNK_SIZE)
 
-  logger.info('Connected by %s', addr)
+  file_logger.info('Connected by %s', addr)
   i = block_count
   size = block_count * CHUNK_SIZE
   while 1:
@@ -88,7 +88,7 @@ def main(nonce, filepath, hash, file_size):
     else: i = i + 1
 
   if str(size) == file_size:
-    logger.info("finished")
+    file_logger.info("finished")
     del history[hash]
 
   # Write the new history that does not include this transfer
