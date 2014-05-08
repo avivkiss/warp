@@ -4,7 +4,9 @@
 
 # some logging setup
 import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+
+LOG_LEVEL = logging.DEBUG
+logging.basicConfig(format='%(levelname)s:%(message)s', level=LOG_LEVEL)
 logger = logging.getLogger('warp')
 
 # Just a random chunk size to send the file in pieces,
@@ -13,10 +15,11 @@ CHUNK_SIZE = 4096
 TRANSACTION_HISTORY_FILENAME = "transaction_history.warp"
 
 
-def get_file_logger(logger, filename="warp.log"):
-  l = logging.getLogger(logger)
+def get_file_logger(logger_name, filename="warp.log"):
+  l = logging.getLogger(logger_name)
   fh = logging.FileHandler(filename)
-  fh.setLevel(logging.DEBUG)
+  fh.setLevel(LOG_LEVEL)
+  l.setLevel(LOG_LEVEL)
   l.addHandler(fh)
 
   return l
