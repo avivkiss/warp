@@ -22,6 +22,10 @@ def main(remote_host, file_src, file_dest):
   send_data(hostname, file_src, port)
 
 def send_data(hostname, file_src, tcp_port, numblocks = 0):
+  """
+  Opens the file at the number of blocks passed in and uses that along with
+  the other parameters to send a file to the host at the specified port.
+  """
   s = connect_to_server(hostname, tcp_port)
   f = open(file_src, 'r')
   f.seek(numblocks * CHUNK_SIZE)
