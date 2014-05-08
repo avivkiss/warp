@@ -6,6 +6,9 @@ from paramiko import SSHClient
 hostkeytype = None
 hostkey = None
 
+# suppress paramiko logging
+logging.getLogger("paramiko").setLevel(logging.WARNING)
+
 def handshake(username, hostname, nonce, file_dest, hash, file_size, port=22, password=None):
   """
   Goal of the handshake is to return an authed TCP connection. Expects

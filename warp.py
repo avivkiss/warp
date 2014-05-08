@@ -17,7 +17,7 @@ def main(remote_host, file_src, file_dest):
     nonce=nonce, file_dest=file_dest, hash=hash, \
     file_size=os.path.getsize(file_src))
 
-  print port, hostname
+  logging.info("Connecting to: %s on port: %s", port, hostname)
 
   send_data(hostname, file_src, port)
 
@@ -85,11 +85,12 @@ def connect_to_server(host_name, port):
     try:
       s.connect(sa)
     except socket.error as msg:
-      #print msg
+      logging.error(msg)
       s.close()
       s = None
       continue
     break
+
   if s is None:
     print 'Could not connect to', host_name
     sys.exit(1)

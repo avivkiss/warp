@@ -13,6 +13,10 @@ import os.path
 import shutil
 from config import *
 
+# setup logging, headless server should log to file...
+logging.basicConfig(filename='warp.log',level=logging.DEBUG)
+
+
 def main(nonce, filepath, hash, file_size):
   """
   Open a port and wait for connection, write to data to filename.
@@ -36,8 +40,11 @@ def main(nonce, filepath, hash, file_size):
 
   (head, tail) = os.path.split(filepath)
   if not tail:
-    print "must specify a file"
-    return
+    # putting this through the logger because at this point the server
+    # is headless and the user will not see the message, TODO add support for
+    # this message in warp.py
+    logging.error("must specify a valid file path")
+    sys.exit()
 
   if head != "" and not os.path.exists(head):
       os.makedirs(head)
@@ -71,7 +78,7 @@ def main(nonce, filepath, hash, file_size):
   
   output_file.seek(block_count * CHUNK_SIZE)
 
-  print 'Connected by', addr
+  logging.info('Connected by %s', addr)
   i = block_count
   size = block_count * CHUNK_SIZE
   while 1:
@@ -82,7 +89,7 @@ def main(nonce, filepath, hash, file_size):
     else: i = i + 1
 
   if str(size) == file_size:
-    print "finished"
+    logging.info("finished")
     del history[hash]
 
   # Write the new history that does not include this transfer
