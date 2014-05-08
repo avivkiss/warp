@@ -58,14 +58,12 @@ def recieve_data(conn, output_file, block_count, addr):
   output_file.seek(block_count * CHUNK_SIZE)
 
   logger.info('Connected by %s', addr)
-  i = block_count
   size = block_count * CHUNK_SIZE
   while 1:
     data = conn.recv(CHUNK_SIZE)
     output_file.write(data)
     size = size + len(data)
     if len(data) != CHUNK_SIZE: break
-    else: i = i + 1
 
   return size
 
