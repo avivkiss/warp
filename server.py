@@ -30,7 +30,7 @@ def main(nonce, filepath, file_hash, file_size):
   block_count, output_file = get_file_and_state(filepath, old_path)
   print block_count
 
-  # background()
+  background()
     
   if file_hash not in history:
     history[file_hash] = {'path' : filepath}
