@@ -11,3 +11,12 @@ logger = logging.getLogger('warp')
 # should be the same as the chunk size used to write
 CHUNK_SIZE = 4096
 TRANSACTION_HISTORY_FILENAME = "transaction_history.warp"
+
+
+def get_file_logger(logger, filename="warp.log"):
+  l = logging.getLogger(logger)
+  fh = logging.FileHandler(filename)
+  fh.setLevel(logging.DEBUG)
+  l.addHandler(fh)
+
+  return l

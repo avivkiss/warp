@@ -14,7 +14,7 @@ import shutil
 from config import *
 
 # setup logging, headless server should log to file...
-logger = get_logger()
+logger = get_file_logger("warp_server")
 
 def main(nonce, filepath, hash, file_size):
   """
@@ -124,14 +124,6 @@ def get_socket():
 def sock_fail():
   print 'could not open socket'
   sys.exit(1)
-
-def get_logger():
-  l = logging.getLogger('server')
-  fh = logging.FileHandler('warp.log')
-  fh.setLevel(logging.DEBUG)
-  l.addHandler(fh)
-
-  return l
 
 if __name__ == '__main__':
   import plac; plac.call(main)
