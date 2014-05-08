@@ -5,6 +5,7 @@
 # some logging setup
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logger = logging.getLogger('warp')
 
 # Just a random chunk size to send the file in pieces,
 # should be the same as the chunk size used to write

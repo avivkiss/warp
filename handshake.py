@@ -27,7 +27,7 @@ def handshake(username, hostname, nonce, file_dest, hash, file_size, port=22, pa
 
     port = stdout.readline().strip()
     block_count = stdout.readline().strip()
-    logging.info("port: %s, block count: %s", port, block_count)
+    logger.info("port: %s, block count: %s", port, block_count)
 
     return (int(port), int(block_count))
 

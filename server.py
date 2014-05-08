@@ -14,8 +14,7 @@ import shutil
 from config import *
 
 # setup logging, headless server should log to file...
-logging.basicConfig(filename='warp.log',filemode='a',level=logging.DEBUG)
-
+logger = get_logger()
 
 def main(nonce, filepath, hash, file_size):
   """
@@ -43,7 +42,7 @@ def main(nonce, filepath, hash, file_size):
     # putting this through the logger because at this point the server
     # is headless and the user will not see the message, TODO add support for
     # this message in warp.py
-    logging.error("must specify a valid file path")
+    logger.error("must specify a valid file path")
     sys.exit()
 
   if head != "" and not os.path.exists(head):
@@ -78,7 +77,7 @@ def main(nonce, filepath, hash, file_size):
   
   output_file.seek(block_count * CHUNK_SIZE)
 
-  logging.info('Connected by %s', addr)
+  logger.info('Connected by %s', addr)
   i = block_count
   size = block_count * CHUNK_SIZE
   while 1:
@@ -89,7 +88,7 @@ def main(nonce, filepath, hash, file_size):
     else: i = i + 1
 
   if str(size) == file_size:
-    logging.info("finished")
+    logger.info("finished")
     del history[hash]
 
   # Write the new history that does not include this transfer
@@ -125,6 +124,14 @@ def get_socket():
 def sock_fail():
   print 'could not open socket'
   sys.exit(1)
+
+def get_logger():
+  l = logging.getLogger('server')
+  fh = logging.FileHandler('warp.log')
+  fh.setLevel(logging.DEBUG)
+  l.addHandler(fh)
+
+  return l
 
 if __name__ == '__main__':
   import plac; plac.call(main)
