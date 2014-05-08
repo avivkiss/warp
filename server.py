@@ -6,12 +6,12 @@ This is the server script that will be started by client over SSH, it takes
 two arguments...
 """
 
+from config import *
 import socket
 import json
 import sys
 import os.path
 import shutil
-from config import *
 
 def main(nonce, filepath, hash, file_size):
   """
