@@ -22,32 +22,39 @@ def main(nonce, filepath, file_hash, file_size):
   """
   sock = get_socket()
   port = sock.getsockname()[1]
-
   print port
 
   old_path, history = get_old_filepath(file_hash)
-
   validate_filepath(filepath)
-
+  
   block_count, output_file = get_file_and_state(filepath, old_path)
-
   print block_count
 
-  # background self
-  if os.fork():
-    sys.exit()
+  background()
     
   if file_hash not in history:
     history[file_hash] = {'path' : filepath}
 
-  # At this point we have created the new file so the transaction
-  # history should be updated
-  with open(TRANSACTION_HISTORY_FILENAME, "w") as f:
-    json.dump(history, f)
-    f.close()
+  write_history(history)
 
   conn, addr = sock.accept()
+  size = recieve_data(conn, output_file, block_count)
   
+  if str(size) == file_size:
+    logger.info("finished")
+    del history[file_hash]
+
+  # Write the new history that does not include this transfer
+  write_history(history)
+
+  output_file.close(file_hash)
+  conn.close()
+
+def recieve_data(conn, output_file, block_count):
+  """
+  Receives data and writes it to disk, stops when it is no longer receiving 
+  data.
+  """
   output_file.seek(block_count * CHUNK_SIZE)
 
   logger.info('Connected by %s', addr)
@@ -60,17 +67,35 @@ def main(nonce, filepath, file_hash, file_size):
     if len(data) != CHUNK_SIZE: break
     else: i = i + 1
 
-  if str(size) == file_size:
-    logger.info("finished")
-    del history[file_hash]
+  return size
 
-  # Write the new history that does not include this transfer
+def background():
+  """
+  Backgrounds the script.
+  """
+  logger.info("Entering background.")
+  if os.fork():
+    sys.exit()
+
+def write_history(history):
+  """
+  Writes the passed in dictionary to the 
+  """
   with open(TRANSACTION_HISTORY_FILENAME, "w") as f:
     json.dump(history, f)
     f.close()
 
-  output_file.close(file_hash)
-  conn.close()
+def get_history():
+  """
+  Looks for the history file and returns a dictionary, empty if not found.
+  """
+  history = {}
+  if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
+    history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
+    history = json.load(history_file)
+    history_file.close()
+
+  return history
 
 def get_file_and_state(filepath, old_path):
   """
@@ -112,13 +137,10 @@ def get_old_filepath(file_hash):
   record of the file None is returned. 
   """
   old_path = None
-  history  = {}
-  if os.path.isfile(TRANSACTION_HISTORY_FILENAME):
-    history_file = open(TRANSACTION_HISTORY_FILENAME, "r")
-    history = json.load(history_file)
-    history_file.close()
-    if file_hash in history:
-      old_path = history[file_hash]['path']
+  history  = get_history()
+
+  if file_hash in history:
+    old_path = history[file_hash]['path']
 
   return old_path, history
 
