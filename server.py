@@ -55,6 +55,9 @@ def main(nonce, filepath, hash, file_size):
 
   print block_count
 
+  if os.fork():
+    sys.exit()
+    
   if hash not in history:
     history[hash] = {'path' : filepath}
 
