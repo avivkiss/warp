@@ -27,7 +27,7 @@ def handshake(username, hostname, nonce, file_dest, hash, file_size, port=22, pa
     block_count = stdout.readline()
     print "block count: ", block_count
 
-    return (port, block_count)
+    return (int(port), int(block_count))
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
