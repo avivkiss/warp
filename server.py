@@ -10,6 +10,7 @@ import socket
 import json
 import sys
 import os.path
+import shutil
 from config import *
 
 def main(nonce, filepath, hash, file_size):
@@ -41,11 +42,13 @@ def main(nonce, filepath, hash, file_size):
   if head != "" and not os.path.exists(head):
       os.makedirs(head)
 
-  # TODO: If old path is not the same as the new path, this should copy
-  # it to the new path
-  if old_path != "" and os.path.samefile(old_path, filepath):
+  if old_path != "":
     block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
-    output_file = open(filepath, "r+")
+    if not os.path.isfile(filepath) or not os.path.samefile(old_path, filepath):
+      output_file = open(filepath, "w")
+      shutil.copyfile(old_path, filepath)
+    else:
+      output_file = open(filepath, "r+")
   else:
     output_file = open(filepath, "w")
     block_count = 0
