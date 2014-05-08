@@ -47,7 +47,7 @@ def main(nonce, filepath, file_hash, file_size):
   # Write the new history that does not include this transfer
   write_history(history)
 
-  output_file.close(file_hash)
+  output_file.close()
   conn.close()
 
 def recieve_data(conn, output_file, block_count):

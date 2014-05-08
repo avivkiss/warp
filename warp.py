@@ -17,7 +17,7 @@ def main(remote_host, file_src, file_dest):
     nonce=nonce, file_dest=file_dest, file_hash=file_hash, \
     file_size=os.path.getsize(file_src))
 
-  logger.info("Connecting to: %s on port: %s", port, hostname)
+  logger.info("Connecting to: %s on port: %s", hostname, port)
 
   send_data(hostname, file_src, port)
 
