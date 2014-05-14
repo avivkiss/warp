@@ -4,11 +4,9 @@ warp
 FTL-FTP
 
 ### Todo
-make .todo file
 tests
 version numbers so that client and server only talk to same versions of each
 other.
-Log to current directory
 
 ### Introduction
 This readme aims to be both a source of documentation and a development plan
