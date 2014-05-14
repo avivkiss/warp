@@ -8,7 +8,14 @@ from config import *
 import socket, sys, hashlib, random, os.path
 from handshake import handshake
 
-def main(remote_host, file_src, file_dest):
+def main(remote_host, recursive, file_src, file_dest):
+  if os.path.isdir(file_src) and not recursive:
+    logger.error("%s is a directory", file_src)
+    return
+  elif not os.path.isdir(file_src) and \
+    not os.path.isfile(file_src):
+      logger.error("%s no such file or directory", file_src)
+      return
   username, hostname, ssh_port = unpack_remote_host(remote_host)
   nonce = generate_nonce()
   file_hash = getHash(file_src)
@@ -100,5 +107,6 @@ def connect_to_server(host_name, port):
 
   return s
 
+main.__annotations__ = dict(recursive = ('prints', 'flag', 'r'))
 if __name__ == '__main__':
   import plac; plac.call(main)
