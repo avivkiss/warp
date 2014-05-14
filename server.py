@@ -49,10 +49,7 @@ def main(nonce, filepath, file_hash, file_size):
   recvd_nonce = conn.recv(NONCE_SIZE)
 
   if recvd_nonce != nonce:
-    logger.info("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
-    sys.stderr.write("Received nonce {} doesn't match {}.\n".format(recvd_nonce,
-                                                                         nonce))
-    sys.exit()
+    fail("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
 
   size = recieve_data(conn, output_file, block_count)
   
@@ -137,10 +134,7 @@ def validate_filepath(filepath):
   (head, tail) = os.path.split(filepath)
   if not tail:
     # TODO add error support for warp.py
-    msg = "Invalid path supplied to server."
-    logger.error(msg)
-    sys.stderr.write(msg)
-    sys.exit()
+    fail("Invalid path supplied to server.")
 
   if head != "" and not os.path.exists(head):
     os.makedirs(head)
@@ -169,21 +163,16 @@ def get_socket():
   try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   except socket.error as msg:
-    sys.stderr.write(msg)
-    sock_fail()
+    fail(msg)
   try:
     s.bind(('', 0))
     s.listen(1)
   except socket.error as msg:
     s.close()
-    sys.stderr.write(msg)
-    sock_fail()
+    fail(msg)
 
   return s
 
-def sock_fail():
-  sys.stderr.write('Could not open socket')
-  sys.exit(1)
 
 if __name__ == '__main__':
   import plac; plac.call(main)

@@ -16,6 +16,10 @@ NONCE_SIZE = 32
 
 
 def get_file_logger(logger_name, filepath="/var/tmp/warp.log"):
+  """
+  Returns a formatted logger that logs to a file and the console. Takes the 
+  logger name as a parameters and optional filepath.
+  """
   l = logging.getLogger(logger_name)
   fh = logging.FileHandler(filepath)
   fh.setLevel(LOG_LEVEL)

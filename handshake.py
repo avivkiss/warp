@@ -70,25 +70,33 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     sys.exit(1)
 
 def verify_partial_hash(file_src, partial_hash, block_count):
+  """
+  Takes a file source and hashes the file up to block count and then compares 
+  it with the partial hash passed in, fails if they do not match.
+  """
   my_hash = getHash(file_src, block_count)
   if partial_hash != my_hash:
     msg = "Partial hash did not match server side. Please remove file from server before transferring.\n"
-    sys.stderr.write(msg)
-    logger.error(msg)
-    sys.exit()
+    fail(msg)
 
 
 def error_check(sftp, stderr_path):
+  """
+  Checks the file that stderr is redirected to for errors. Prints them and exits
+  if found.
+  """
   with sftp.open(stderr_path) as f:
     err = f.read()
     if err == "":
       return
     else:
-      sys.stderr.write(err)
-      sys.exit()
+      fail(err)
 
 
 def connect_to_server(host_name, port):
+  """
+  Connects to the provided host and port returning a socket object.
+  """
   s = None
 
   for res in socket.getaddrinfo(host_name, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
@@ -108,7 +116,6 @@ def connect_to_server(host_name, port):
     break
 
   if s is None:
-    sys.stderr.write('Could not connect to' + host_name)
-    sys.exit(1)
+    fail('Could not connect to' + host_name)
 
   return s

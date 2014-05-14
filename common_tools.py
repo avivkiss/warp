@@ -17,4 +17,10 @@ def getHash(file, block_count=0):
       i += 1
       hash.update(data)
 
-      
+def fail(msg):
+  """
+  Simple fail function that prints and logs the error message and then exits.
+  """
+  logger.error(msg)
+  sys.stderr.write(msg)
+  sys.exit(1)

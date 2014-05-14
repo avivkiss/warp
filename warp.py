@@ -6,7 +6,7 @@ This is the main driver script that will run on the client.
 
 from config import *
 from common_tools import *
-import sys, random, os.path
+import random, os.path
 from handshake import handshake
 
 def main(remote_host, recursive, file_src, file_dest):
@@ -59,8 +59,7 @@ def unpack_remote_host(remote_host):
     username, hostname = remote_host.split('@')
 
   if len(hostname) == 0 or len(username) == 0:
-    sys.stderr.write('Hostname/username required.')
-    sys.exit(1)
+    fail('Hostname/username required.')
 
   if hostname.find(':') >= 0:
     hostname, portstr = hostname.split(':')

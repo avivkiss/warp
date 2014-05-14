@@ -1,10 +1,9 @@
 A todo list in taskpaper format, try taskpaper from the Mac App store  or install plaintasks in Sublime Text.
 
 Aviv:
-	- Add nonce verification in handshake.py @done
-	- partial data verification
+	- version number handshake
 	- refactor
-		- all error should call same error function that prints to stderr and logs
 		- make big methods into smaller ones
+		- comments @done
 Noah:
 	- Add todos here
