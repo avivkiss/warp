@@ -48,7 +48,6 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
       verify_partial_hash(file_src, partial_hash, block_count)
 
     logger.info("port: %s, block count: %s", port, block_count)
-
     logger.info("Connecting to: %s on port: %s", hostname, port)
 
     sock = connect_to_server(hostname, port)

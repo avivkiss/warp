@@ -4,6 +4,5 @@ Aviv:
 	- version number handshake
 	- refactor
 		- make big methods into smaller ones
-		- comments @done
 Noah:
 	- Add todos here
