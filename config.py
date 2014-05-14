@@ -14,9 +14,9 @@ CHUNK_SIZE = 4096
 TRANSACTION_HISTORY_FILENAME = "transaction_history.warp"
 
 
-def get_file_logger(logger_name, filename="warp.log"):
+def get_file_logger(logger_name, filepath="/var/tmp/warp.log"):
   l = logging.getLogger(logger_name)
-  fh = logging.FileHandler(filename)
+  fh = logging.FileHandler(filepath)
   fh.setLevel(LOG_LEVEL)
   formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
   fh.setFormatter(formatter)

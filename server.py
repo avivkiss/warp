@@ -4,9 +4,6 @@
 """
 This is the server script that will be started by client over SSH, it takes 
 two arguments...
-
-TODO:
-For some reason when this script is executed over SSH logging is not working.
 """
 
 from config import *

@@ -85,6 +85,8 @@ this to read in config from a configuration file.
 ### Project Setup
 To install dependencies run `pip install -r requirements.txt`.
 
+Logs for the program will be stored in '/var/tmp/warp.log'.
+
 White space is significant in Python. For this project we will use 2 spaces for
 each level of indentation. 
 
