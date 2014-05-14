@@ -2,10 +2,5 @@ A todo list in taskpaper format, try taskpaper from the Mac App store  or instal
 
 Aviv:
 	- Add nonce verification in handshake.py
-	- addssaadd printing of error messages to server.py @done
-	- forward stderr from server.py to warp.py @done
-	- more user friendly error messages
-	- add error checks to handshake and server stuff
-	- print error messages to stderr
 Noah:
 	- Add todos here
