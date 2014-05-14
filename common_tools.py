@@ -1,5 +1,6 @@
 from config import *
 import hashlib
+import sys
 
 def getHash(file, block_count=0):
   """
