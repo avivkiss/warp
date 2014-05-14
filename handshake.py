@@ -1,6 +1,7 @@
 
 import sys, traceback
 from config import *
+from common_tools import *
 from paramiko import SSHClient, SFTPClient
 import socket
 
@@ -10,7 +11,8 @@ hostkey = None
 # suppress paramiko logging
 logging.getLogger("paramiko").setLevel(logging.WARNING)
 
-def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=22, password=None):
+def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
+              file_src, port=22, password=None):
   """
   Goal of the handshake is to return an authed TCP connection. Expects
   executable for alias warp, for now will return (port, block_count) tuple.
@@ -40,6 +42,11 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
 
     port = int(out[0].strip())
     block_count = int(out[1].strip())
+    partial_hash = out[2]
+
+    if block_count > 0:
+      verify_partial_hash(file_src, partial_hash, block_count)
+
     logger.info("port: %s, block count: %s", port, block_count)
 
     logger.info("Connecting to: %s on port: %s", hostname, port)
@@ -61,6 +68,15 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
     except:
       pass
     sys.exit(1)
+
+def verify_partial_hash(file_src, partial_hash, block_count):
+  my_hash = getHash(file_src, block_count)
+  if partial_hash != my_hash:
+    msg = "Partial hash did not match server side. Please remove file from server before transferring.\n"
+    sys.stderr.write(msg)
+    logger.error(msg)
+    sys.exit()
+
 
 def error_check(sftp, stderr_path):
   with sftp.open(stderr_path) as f:

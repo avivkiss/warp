@@ -3,5 +3,8 @@ A todo list in taskpaper format, try taskpaper from the Mac App store  or instal
 Aviv:
 	- Add nonce verification in handshake.py @done
 	- partial data verification
+	- refactor
+		- all error should call same error function that prints to stderr and logs
+		- make big methods into smaller ones
 Noah:
 	- Add todos here

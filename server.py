@@ -7,6 +7,7 @@ two arguments...
 """
 
 from config import *
+from common_tools import *
 import socket
 import json
 import sys
@@ -29,6 +30,12 @@ def main(nonce, filepath, file_hash, file_size):
   block_count, output_file = get_file_and_state(filepath, old_path)
   print block_count
 
+  file_hash = 0
+  if block_count != 0:
+    file_hash = getHash(filepath, block_count)
+
+  print file_hash
+  
   background()
     
   if file_hash not in history:

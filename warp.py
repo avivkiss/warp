@@ -5,7 +5,8 @@ This is the main driver script that will run on the client.
 """
 
 from config import *
-import sys, hashlib, random, os.path
+from common_tools import *
+import sys, random, os.path
 from handshake import handshake
 
 def main(remote_host, recursive, file_src, file_dest):
@@ -22,7 +23,7 @@ def main(remote_host, recursive, file_src, file_dest):
   # handshake should be returning a tuple, port and numblocks TODO
   sock, block_count = handshake(username=username, hostname=hostname, \
     nonce=nonce, file_dest=file_dest, file_hash=file_hash, \
-    file_size=os.path.getsize(file_src))
+    file_size=os.path.getsize(file_src), file_src=file_src)
 
   send_data(sock, file_src, block_count)
 
@@ -45,19 +46,6 @@ def generate_nonce(length=NONCE_SIZE):
   """Generate pseudorandom number. Ripped from google."""
   return ''.join([str(random.randint(0, 9)) for i in range(length)])
 
-def getHash(file):
-  """
-  Returns a sha256 hash for the specified file.
-  Eventually sent to server to check for restarts.
-  """
-  hash = hashlib.sha256()
-  with open(file, "r") as file:
-    while True:
-      data = file.read(CHUNK_SIZE)
-      if not data:
-        file.close()
-        return hash.hexdigest()
-      hash.update(data)
 
 def unpack_remote_host(remote_host):
   """
