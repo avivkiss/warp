@@ -29,7 +29,6 @@ def main(nonce, filepath, file_hash, file_size):
   block_count, output_file = get_file_and_state(filepath, old_path)
   print block_count
 
-  # sys.stderr.write("Hello\n")
   background()
     
   if file_hash not in history:
@@ -52,7 +51,7 @@ def main(nonce, filepath, file_hash, file_size):
   conn.close()
 
 def recieve_data(conn, output_file, block_count):
-  """m
+  """
   Receives data and writes it to disk, stops when it is no longer receiving 
   data.
   """
@@ -122,7 +121,9 @@ def validate_filepath(filepath):
   (head, tail) = os.path.split(filepath)
   if not tail:
     # TODO add error support for warp.py
-    logger.error("must specify a valid file path")
+    msg = "Invalid path supplied to server."
+    logger.error(msg)
+    sys.stderr.write(msg)
     sys.exit()
 
   if head != "" and not os.path.exists(head):
@@ -152,20 +153,20 @@ def get_socket():
   try:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   except socket.error as msg:
-    print msg
+    sys.stderr.write(msg)
     sock_fail()
   try:
     s.bind(('', 0))
     s.listen(1)
   except socket.error as msg:
     s.close()
-    print msg
+    sys.stderr.write(msg)
     sock_fail()
 
   return s
 
 def sock_fail():
-  print 'could not open socket'
+  sys.stderr.write('Could not open socket')
   sys.exit(1)
 
 if __name__ == '__main__':

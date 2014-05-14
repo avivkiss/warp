@@ -1,7 +1,7 @@
 
 import sys, traceback
 from config import *
-from paramiko import SSHClient
+from paramiko import SSHClient, SFTPClient
 import socket
 
 hostkeytype = None
@@ -20,17 +20,28 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
     client = SSHClient()
     client.load_system_host_keys()
     client.connect(hostname, username=username, port=port)
+
+    stderr_path = "/var/tmp/" + str(file_hash) + ".err"
+    stdout_path = "/var/tmp/" + str(file_hash) + ".out"
+
     command = 'warp ' + str(nonce) + ' ' + \
-     file_dest + ' ' + str(file_hash) + ' ' + str(file_size)
+     file_dest + ' ' + str(file_hash) + ' ' + str(file_size) + ' 2> ' + \
+      stderr_path + ' > ' + stdout_path
     stdin, stdout, stderr = client.exec_command(command)
 
     logger.debug("Command to server is: %s", command)
 
-    err = stderr.read()
+    sftp = SFTPClient.from_transport(client.get_transport())
+
+    with sftp.open(stderr_path) as f:
+      err = f.read()
+
+    with sftp.open(stdout_path) as f:
+      out = f.readlines()
 
     if err == "":
-      port = int(stdout.readline().strip())
-      block_count = int(stdout.readline().strip())
+      port = int(out[0].strip())
+      block_count = int(out[1].strip())
       logger.info("port: %s, block count: %s", port, block_count)
 
       logger.info("Connecting to: %s on port: %s", hostname, port)
@@ -38,9 +49,8 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
       return connect_to_server(hostname, port), block_count
     else:
       # Add log statement and print to stderr
-      for line in err:
-        print line
-        sys.exit()
+      sys.stderr.write(err)
+      sys.exit()
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
@@ -74,7 +84,7 @@ def connect_to_server(host_name, port):
     break
 
   if s is None:
-    print 'Could not connect to', host_name
+    sys.stderr.write('Could not connect to' + host_name)
     sys.exit(1)
 
   return s

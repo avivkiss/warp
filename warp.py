@@ -38,6 +38,7 @@ def send_data(sock, file_src, block_count = 0):
     sock.sendall(data)
     data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
+  logger.info("Data sent.")
   sock.close()
 
 def generate_nonce(length=8):
@@ -70,7 +71,7 @@ def unpack_remote_host(remote_host):
     username, hostname = remote_host.split('@')
 
   if len(hostname) == 0 or len(username) == 0:
-    print('Hostname/username required.')
+    sys.stderr.write('Hostname/username required.')
     sys.exit(1)
 
   if hostname.find(':') >= 0:
