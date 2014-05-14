@@ -2,6 +2,7 @@
 import sys, traceback
 from config import *
 from paramiko import SSHClient
+import socket
 
 hostkeytype = None
 hostkey = None
@@ -23,16 +24,23 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
      file_dest + ' ' + str(file_hash) + ' ' + str(file_size)
     stdin, stdout, stderr = client.exec_command(command)
 
-    logging.debug("Command to server is: %s", command)
-    
-    # TODO error checking
-    # print stdout.read()
+    logger.debug("Command to server is: %s", command)
 
-    port = stdout.readline().strip()
-    block_count = stdout.readline().strip()
-    logger.info("port: %s, block count: %s", port, block_count)
+    err = stderr.read()
 
-    return (int(port), int(block_count))
+    if err == "":
+      port = int(stdout.readline().strip())
+      block_count = int(stdout.readline().strip())
+      logger.info("port: %s, block count: %s", port, block_count)
+
+      logger.info("Connecting to: %s on port: %s", hostname, port)
+
+      return connect_to_server(hostname, port), block_count
+    else:
+      # Add log statement and print to stderr
+      for line in err:
+        print line
+        sys.exit()
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
@@ -46,3 +54,27 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
     sys.exit(1)
 
 
+def connect_to_server(host_name, port):
+  s = None
+
+  for res in socket.getaddrinfo(host_name, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+    af, socktype, proto, canonname, sa = res
+    try:
+      s = socket.socket(af, socktype, proto)
+    except socket.error as msg:
+      s = None
+      continue
+    try:
+      s.connect(sa)
+    except socket.error as msg:
+      logger.error(msg)
+      s.close()
+      s = None
+      continue
+    break
+
+  if s is None:
+    print 'Could not connect to', host_name
+    sys.exit(1)
+
+  return s

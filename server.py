@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python 
 
 
 """
@@ -12,6 +12,8 @@ import json
 import sys
 import os.path
 import shutil
+
+logger.propagate = False
 
 def main(nonce, filepath, file_hash, file_size):
   """
@@ -27,6 +29,7 @@ def main(nonce, filepath, file_hash, file_size):
   block_count, output_file = get_file_and_state(filepath, old_path)
   print block_count
 
+  # sys.stderr.write("Hello\n")
   background()
     
   if file_hash not in history:
