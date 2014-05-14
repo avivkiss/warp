@@ -1,6 +1,7 @@
 A todo list in taskpaper format, try taskpaper from the Mac App store  or install plaintasks in Sublime Text.
 
 Aviv:
-	- Add nonce verification in handshake.py
+	- Add nonce verification in handshake.py @done
+	- partial data verification
 Noah:
 	- Add todos here

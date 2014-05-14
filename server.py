@@ -38,6 +38,15 @@ def main(nonce, filepath, file_hash, file_size):
 
   conn, addr = sock.accept()
   logger.info('Connected by %s', addr)
+
+  recvd_nonce = conn.recv(NONCE_SIZE)
+
+  if recvd_nonce != nonce:
+    logger.info("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
+    sys.stderr.write("Received nonce {} doesn't match {}.\n".format(recvd_nonce,
+                                                                         nonce))
+    sys.exit()
+
   size = recieve_data(conn, output_file, block_count)
   
   if str(size) == file_size:

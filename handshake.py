@@ -33,24 +33,23 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
 
     sftp = SFTPClient.from_transport(client.get_transport())
 
-    with sftp.open(stderr_path) as f:
-      err = f.read()
-
     with sftp.open(stdout_path) as f:
       out = f.readlines()
 
-    if err == "":
-      port = int(out[0].strip())
-      block_count = int(out[1].strip())
-      logger.info("port: %s, block count: %s", port, block_count)
+    error_check(sftp, stderr_path)
 
-      logger.info("Connecting to: %s on port: %s", hostname, port)
+    port = int(out[0].strip())
+    block_count = int(out[1].strip())
+    logger.info("port: %s, block count: %s", port, block_count)
 
-      return connect_to_server(hostname, port), block_count
-    else:
-      # Add log statement and print to stderr
-      sys.stderr.write(err)
-      sys.exit()
+    logger.info("Connecting to: %s on port: %s", hostname, port)
+
+    sock = connect_to_server(hostname, port)
+
+    sock.sendall(nonce)
+    error_check(sftp, stderr_path)
+
+    return sock, block_count
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
@@ -62,6 +61,15 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size, port=2
     except:
       pass
     sys.exit(1)
+
+def error_check(sftp, stderr_path):
+  with sftp.open(stderr_path) as f:
+    err = f.read()
+    if err == "":
+      return
+    else:
+      sys.stderr.write(err)
+      sys.exit()
 
 
 def connect_to_server(host_name, port):
