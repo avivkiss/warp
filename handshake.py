@@ -35,6 +35,8 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
 
     sftp = SFTPClient.from_transport(client.get_transport())
 
+    while not is_output(sftp, stdout_path, stderr_path): pass
+
     with sftp.open(stdout_path) as f:
       out = f.readlines()
 
@@ -67,6 +69,18 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     except:
       pass
     sys.exit(1)
+
+def is_output(sftp, stdout_path, stderr_path):
+  with sftp.open(stdout_path) as f:
+      out = f.read()
+
+  with sftp.open(stdout_path) as f:
+      err = f.read()
+
+  if err == "" and out == "":
+    return False
+  else:
+    return True
 
 def verify_partial_hash(file_src, partial_hash, block_count):
   """
