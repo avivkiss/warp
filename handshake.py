@@ -74,7 +74,7 @@ def is_output(sftp, stdout_path, stderr_path):
   with sftp.open(stdout_path) as f:
       out = f.read()
 
-  with sftp.open(stdout_path) as f:
+  with sftp.open(stderr_path) as f:
       err = f.read()
 
   if err == "" and out == "":
