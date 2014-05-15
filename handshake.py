@@ -3,7 +3,7 @@ import sys, traceback
 from config import *
 from common_tools import *
 from paramiko import SSHClient, SFTPClient
-import socket
+import socket, paramiko, getpass
 
 hostkeytype = None
 hostkey = None
@@ -21,7 +21,13 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
   try:
     client = SSHClient()
     client.load_system_host_keys()
-    client.connect(hostname, username=username, port=port)
+
+    try:
+      client.connect(hostname, username=username, port=port)
+    except paramiko.PasswordRequiredException:
+      password = getpass.getpass('Password for %s@%s: ' % (username, hostname))
+      client.connect(hostname, username=username, port=port, password=password)
+      
 
     stderr_path = "/var/tmp/" + str(file_hash) + ".err"
     stdout_path = "/var/tmp/" + str(file_hash) + ".out"
