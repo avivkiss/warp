@@ -88,7 +88,7 @@ def verify_partial_hash(file_src, partial_hash, block_count):
   it with the partial hash passed in, fails if they do not match.
   """
   my_hash = getHash(file_src, block_count)
-  if partial_hash is my_hash:
+  if partial_hash != my_hash:
     msg = "Partial hash did not match server side. Please remove file from server before transferring.\n"
     fail(msg)
 
