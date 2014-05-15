@@ -30,11 +30,11 @@ def main(nonce, filepath, file_hash, file_size):
   block_count, output_file = get_file_and_state(filepath, old_path)
   print block_count
 
-  file_hash = 0
+  partial_file_hash = 0
   if block_count != 0:
-    file_hash = getHash(filepath, block_count)
+    partial_file_hash = getHash(filepath, block_count)
 
-  print file_hash
+  print partial_file_hash
   
   background()
     
