@@ -35,7 +35,7 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
 
     sftp = SFTPClient.from_transport(client.get_transport())
 
-    while not is_output(sftp, stdout_path, stderr_path): pass
+    wait_for_output(sftp, stdout_path, stderr_path)
 
     with sftp.open(stdout_path) as f:
       out = f.readlines()
@@ -69,6 +69,10 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     except:
       pass
     sys.exit(1)
+
+@timeout(30, os.strerror(errno.ETIMEDOUT))
+def wait_for_output(sftp, stdout_path, stderr_path):
+  while not is_output(sftp, stdout_path, stderr_path): pass
 
 def is_output(sftp, stdout_path, stderr_path):
   with sftp.open(stdout_path) as f:
