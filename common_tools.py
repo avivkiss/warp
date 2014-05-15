@@ -12,7 +12,7 @@ def getHash(file, block_count=0):
   with open(file, "r") as file:
     while True:
       data = file.read(CHUNK_SIZE)
-      if not data or (block_count != 0 and i <= block_count):
+      if not data or (block_count != 0 and i >= block_count):
         file.close()
         return hash.hexdigest()
       i += 1
