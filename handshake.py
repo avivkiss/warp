@@ -44,7 +44,7 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
 
     port = int(out[0].strip())
     block_count = int(out[1].strip())
-    partial_hash = out[2]
+    partial_hash = out[2].strip()
 
     if block_count > 0:
       verify_partial_hash(file_src, partial_hash, block_count)
