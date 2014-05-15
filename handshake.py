@@ -33,8 +33,8 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     stdout_path = "/var/tmp/" + str(file_hash) + ".out"
 
     command = 'warp ' + str(nonce) + ' ' + \
-     file_dest + ' ' + str(file_hash) + ' ' + str(file_size) + ' 2> ' + \
-      stderr_path + ' > ' + stdout_path
+     file_dest + ' ' + str(file_hash) + ' ' + str(file_size) + ' '+ file_src + \
+       ' 2> ' + stderr_path + ' > ' + stdout_path
     stdin, stdout, stderr = client.exec_command(command)
 
     logger.debug("Command to server is: %s", command)

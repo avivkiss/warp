@@ -16,7 +16,7 @@ import shutil
 
 logger.propagate = False
 
-def main(nonce, filepath, file_hash, file_size):
+def main(nonce, filepath, file_hash, file_size, client_path):
   """
   Open a port and wait for connection, write to data to filename.
   """
@@ -25,7 +25,7 @@ def main(nonce, filepath, file_hash, file_size):
   print port
 
   old_path, history = get_old_filepath(file_hash)
-  validate_filepath(filepath)
+  filepath = validate_filepath(filepath, client_path)
   
   block_count, output_file = get_file_and_state(filepath, old_path)
   print block_count
@@ -127,17 +127,27 @@ def get_file_and_state(filepath, old_path):
 
   return block_count, output_file
 
-def validate_filepath(filepath):
+def validate_filepath(filepath, client_path):
   """
-  Validates the filepath, and creates the path if it does not exist. 
+  Validates the filepath, and returns the correct path
   """
   (head, tail) = os.path.split(filepath)
   if not tail:
-    # TODO add error support for warp.py
-    fail("Invalid path supplied to server.")
+    if not os.path.exists(head):
+      # TODO add error support for warp.py
+      fail("Directory " + head + " does not exist.")
+    else:
+        (client_head, client_tail) = os.path.split(client_path)
+        return os.path.join(head, client_tail)
 
-  if head != "" and not os.path.exists(head):
-    os.makedirs(head)
+  elif head != "" and not os.path.exists(head):
+    fail(filepath + ": No such file or directory")
+
+  elif not head and os.path.isdir(tail):
+    (client_head, client_tail) = os.path.split(client_path)
+    return os.path.join(tail, client_tail)
+
+  return filepath
 
 def get_old_filepath(file_hash):
   """
