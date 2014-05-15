@@ -108,8 +108,8 @@ def connect_to_server(host_name, port):
     try:
       s.connect(sa)
     except socket.error as msg:
-      logger.error(msg)
       s.close()
+      # No need to log error here, some errors are expected
       s = None
       continue
     break
