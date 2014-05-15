@@ -10,8 +10,12 @@ import random, os.path
 from handshake import handshake
 
 def main(remote_host, recursive, file_src, file_dest):
+  (head, tail) = os.path.split(file_src)
   if os.path.isdir(file_src) and not recursive:
     logger.error("%s is a directory", file_src)
+    return
+  elif not tail and os.path.isfile(head):
+    logger.error("%s: not a directory", file_src)
     return
   elif not os.path.isdir(file_src) and \
     not os.path.isfile(file_src):
