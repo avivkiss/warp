@@ -4,6 +4,8 @@ from config import *
 from common_tools import *
 from paramiko import SSHClient, SFTPClient
 import socket, paramiko, getpass
+from udt4py import UDTSocket
+
 
 hostkeytype = None
 hostkey = None
@@ -41,6 +43,7 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
 
     sftp = SFTPClient.from_transport(client.get_transport())
 
+    # sys.stderr.write("here\n")
     wait_for_output(sftp, stdout_path, stderr_path)
 
     with sftp.open(stdout_path) as f:
@@ -58,12 +61,16 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     logger.info("port: %s, block count: %s", port, block_count)
     logger.info("Connecting to: %s on port: %s", hostname, port)
 
-    sock = connect_to_server(hostname, port)
+    # sock = connect_to_server(hostname, port)
 
-    sock.sendall(nonce)
+    udt_sock = UDTSocket()
+    # udt_sock.bind(sock.fileno())
+
+    udt_sock.connect((socket.gethostbyname(hostname), port))
+    udt_sock.send(bytearray(nonce))
     error_check(sftp, stderr_path)
 
-    return sock, block_count
+    return udt_sock, block_count
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
@@ -122,7 +129,7 @@ def connect_to_server(host_name, port):
   """
   s = None
 
-  for res in socket.getaddrinfo(host_name, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+  for res in socket.getaddrinfo(host_name, port, socket.AF_UNSPEC, socket.SOCK_DGRAM):
     af, socktype, proto, canonname, sa = res
     try:
       s = socket.socket(af, socktype, proto)

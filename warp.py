@@ -40,7 +40,7 @@ def send_data(sock, file_src, block_count = 0):
   f.seek(block_count * CHUNK_SIZE)
   data = f.read(CHUNK_SIZE)
   while data :
-    sock.sendall(data)
+    sock.send(bytearray(data))
     data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
   logger.info("Data sent.")

@@ -13,6 +13,7 @@ import json
 import sys
 import os.path
 import shutil
+from udt4py import UDTSocket
 
 logger.propagate = False
 
@@ -21,7 +22,9 @@ def main(nonce, filepath, file_hash, file_size, client_path):
   Open a port and wait for connection, write to data to filename.
   """
   sock = get_socket()
+  # sys.stderr.write("here\n")
   port = sock.getsockname()[1]
+  
   print port
 
   old_path, history = get_old_filepath(file_hash)
@@ -42,11 +45,16 @@ def main(nonce, filepath, file_hash, file_size, client_path):
     history[file_hash] = {'path' : filepath}
 
   write_history(history)
-
-  conn, addr = sock.accept()
+  
+  udt_sock = UDTSocket()
+  udt_sock.bind(sock.fileno())
+  udt_sock.listen()
+  conn, addr = udt_sock.accept()
   logger.info('Connected by %s', addr)
 
-  recvd_nonce = conn.recv(NONCE_SIZE)
+  recvd_nonce = bytearray(NONCE_SIZE) 
+  conn.recv(recvd_nonce)
+  recvd_nonce = str(recvd_nonce)
 
   if recvd_nonce != nonce:
     fail("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
@@ -72,10 +80,12 @@ def recieve_data(conn, output_file, block_count):
 
   size = block_count * CHUNK_SIZE
   while 1:
-    data = conn.recv(CHUNK_SIZE)
+    data = bytearray(CHUNK_SIZE)
+    len_rec = conn.recv(data)
+    data = str(data)
     output_file.write(data)
     size = size + len(data)
-    if len(data) == 0: break
+    if len_rec == 0: break
 
   return size
 
@@ -114,6 +124,7 @@ def get_file_and_state(filepath, old_path):
   """
 
   block_count = 0
+
   if old_path:
     block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
     if not os.path.isfile(filepath) or not os.path.samefile(old_path, filepath):
@@ -171,15 +182,15 @@ def get_socket():
   s = None
 
   try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   except socket.error as msg:
     fail(msg)
   try:
     s.bind(('', 0))
-    s.listen(1)
+    # s.listen(1)
   except socket.error as msg:
     s.close()
-    fail(msg)
+    fail(str(msg))
 
   return s
 
