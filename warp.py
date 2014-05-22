@@ -8,6 +8,7 @@ from config import *
 from common_tools import *
 import random, os.path
 from handshake import handshake
+from clint.textui import progress
 
 def main(remote_host, recursive, file_src, file_dest):
   (head, tail) = os.path.split(file_src)
@@ -39,9 +40,12 @@ def send_data(sock, file_src, block_count = 0):
   f = open(file_src, 'r')
   f.seek(block_count * CHUNK_SIZE)
   data = f.read(CHUNK_SIZE)
-  while data :
-    sock.send(bytearray(data))
-    data = f.read(CHUNK_SIZE)
+
+  with progress.Bar(label="", expected_size=os.path.getsize(file_src)) as bar:
+    while data :
+      bar.show(f.tell())
+      sock.send(bytearray(data))
+      data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
   logger.info("Data sent.")
   sock.close()
