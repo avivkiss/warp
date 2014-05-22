@@ -78,13 +78,19 @@ def recieve_data(conn, output_file, block_count):
   """
   output_file.seek(block_count * CHUNK_SIZE)
 
+  i = 0
   size = block_count * CHUNK_SIZE
   while 1:
     data = bytearray(CHUNK_SIZE)
+    i +=1
+    logger.info("calling recv " + str(i))
     len_rec = conn.recv(data)
     data = str(data)
-    output_file.write(data)
-    size = size + len(data)
+
+    logger.info("Write called on block " + str(i))
+    output_file.write(data[:(len_rec - CHUNK_SIZE)])
+    size = size + len_rec
+
     if len_rec == 0: break
 
   return size

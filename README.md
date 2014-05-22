@@ -6,7 +6,7 @@ FTL-FTP
 ### Todo
 tests
 version numbers so that client and server only talk to same versions of each
-other. 
+other.  
 
 ### Introduction
 This readme aims to be both a source of documentation and a development plan
@@ -86,5 +86,5 @@ To install dependencies run `pip install -r requirements.txt`.
 Logs for the program will be stored in '/var/tmp/warp.log'.
 
 White space is significant in Python. For this project we will use 2 spaces for
-each level of indentation. 
+each level of indentation.      
 
