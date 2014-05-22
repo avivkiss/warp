@@ -59,7 +59,7 @@ def main(nonce, filepath, file_hash, file_size, client_path):
   if recvd_nonce != nonce:
     fail("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
 
-  size = recieve_data(conn, output_file, block_count)
+  size = recieve_data(conn, output_file, block_count, file_size)
   
   if str(size) == file_size:
     logger.info("finished")
@@ -71,27 +71,22 @@ def main(nonce, filepath, file_hash, file_size, client_path):
   output_file.close()
   conn.close()
 
-def recieve_data(conn, output_file, block_count):
+def recieve_data(conn, output_file, block_count, file_size):
   """
   Receives data and writes it to disk, stops when it is no longer receiving 
   data.
   """
   output_file.seek(block_count * CHUNK_SIZE)
 
-  i = 0
   size = block_count * CHUNK_SIZE
   while 1:
     data = bytearray(CHUNK_SIZE)
-    i +=1
-    logger.info("calling recv " + str(i))
     len_rec = conn.recv(data)
     data = str(data)
-
-    logger.info("Write called on block " + str(i))
-    output_file.write(data[:(len_rec - CHUNK_SIZE)])
+    output_file.write(data[:len_rec])
     size = size + len_rec
 
-    if len_rec == 0: break
+    if len_rec == 0 or str(size) == str(file_size): break
 
   return size
 
