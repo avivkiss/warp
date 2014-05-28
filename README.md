@@ -7,7 +7,7 @@ FTL-FTP
 **warp** is a file transfer utility that uses UDT as its data transfer protocol. **warp** is currently in *alpha* and as such is not yet feature complete. **warp** is intended to mimic the basic functionality of standard ftp clients. At the moment it is missing support for many command line options, one notable current omission is directory transfers. 
 
 ## Installation
-These instructions are for installing on Ubuntu or Max OS X. There is no reason why this can't be installed on any Linux distro, but the distros differ in package managers and the instructions here are tailored to Ubuntu. 
+These instructions are for installing on Ubuntu or Max OS X. There is no reason why this can't be installed on any Linux distro, but the distros differ in package managers and the instructions here are tailored to Ubuntu. For installing on Mac, make sure you have the developer tools installed.
 
 At the current moment the installation procedure is a bit involved and requires root privileges. 
 
@@ -36,12 +36,13 @@ The first step is installing UDT. To do this we will download and build UDT from
 
 ### Install warp
 1. **Clone warp:** You can install warp anywhere on your system, but we recommend installing it in the `~/.warp` directory. You can do this with the following command: `git clone https://github.com/avivkiss/warp.git ~/.warp`.
-2. **Python dependencies:** warp was built and tested with python 2.7. In order to install the required python packages you must have pip installed. If you do not see the pip [installation page](https://pip.pypa.io/en/latest/installing.html) for more details (on Ubuntu you can just type `apt-get install python-pip`. Once you have pip installed you can install the requirements with the following command: ` `.
-
-### Python dependencies
-warp was built and tested with python 2.7. In order to install the required python package requirements.
-
-[Installing pip.](https://pip.pypa.io/en/latest/installing.html)
-
+2. **Python dependencies:** warp was built and tested with python 2.7. In order to install the required python packages you must have pip installed. If you do not see the pip [installation page](https://pip.pypa.io/en/latest/installing.html) for more details (on Ubuntu you can just type `apt-get install python-pip`. Once you have pip installed you can install the requirements with the following commands:
+    - Ubuntu: `sudo apt-get install python-dev libxml2-dev libxslt-dev`
+    - `pip install -r ~/.warp/requirements.txt`
+3. **Symbolic Links:** In order to use warp as intended you must install 2 symbolic links that will be present in your default path. You can do this with the following two commands:
+    - `ln -s ~/.warp/server.py /usr/local/bin/warp-server`
+    - `ln -s ~/.warp/warp.py /usr/local/bin/warp`
+4. **Step 4:** There is no step 4.
 
 ### Usage
+In order to use warp it must be installed on both the client and server. To transfer a file enter a command of the format `warp.py [-h] [-t] remote_host file_src file_dest`. `'-h'` will output the usage message. If you are authenticating with a password over SSH you will be prompted for the password after warp fails to connect with a local key.
