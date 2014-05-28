@@ -61,16 +61,17 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     logger.info("port: %s, block count: %s", port, block_count)
     logger.info("Connecting to: %s on port: %s", hostname, port)
 
-    # sock = connect_to_server(hostname, port)
+    if not TCP_MODE:
+      sock = UDTSocket()
+      sock.connect((socket.gethostbyname(hostname), port))
+      sock.send(bytearray(nonce))
+    else:
+      sock = connect_to_server(hostname, port)
+      sock.sendall(nonce)
 
-    udt_sock = UDTSocket()
-    # udt_sock.bind(sock.fileno())
 
-    udt_sock.connect((socket.gethostbyname(hostname), port))
-    udt_sock.send(bytearray(nonce))
     error_check(sftp, stderr_path)
-
-    return udt_sock, block_count
+    return sock, block_count
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
@@ -129,16 +130,22 @@ def connect_to_server(host_name, port):
   """
   s = None
 
-  for res in socket.getaddrinfo(host_name, port, socket.AF_UNSPEC, socket.SOCK_DGRAM):
+  if TCP_MODE:
+    sock_type = socket.SOCK_STREAM
+  else:
+    sock_type = socket.SOCK_DGRAM
+
+
+  for res in socket.getaddrinfo(host_name, port, socket.AF_UNSPEC, sock_type):
     af, socktype, proto, canonname, sa = res
     try:
       s = socket.socket(af, socktype, proto)
-    except socket.error as msg:
+    except socket.error:
       s = None
       continue
     try:
       s.connect(sa)
-    except socket.error as msg:
+    except socket.error:
       s.close()
       # No need to log error here, some errors are expected
       s = None

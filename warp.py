@@ -9,9 +9,16 @@ from common_tools import *
 import random, os.path
 from handshake import handshake
 from clint.textui import progress
+import plac
 
-def main(remote_host, recursive, file_src, file_dest):
+@plac.annotations(
+    tcp_mode=('TCP mode', 'flag', 't'),
+    recursive = ('prints', 'flag', 'r'))
+def main(remote_host, recursive, file_src, file_dest, tcp_mode):
   (head, tail) = os.path.split(file_src)
+
+  TCP_MODE = tcp_mode
+
   if os.path.isdir(file_src) and not recursive:
     logger.error("%s is a directory", file_src)
     return
@@ -45,7 +52,10 @@ def send_data(sock, file_src, block_count = 0):
     while data :
       bar.show(f.tell())
       # TODO make this same array every time
-      sock.send(bytearray(data))
+      if not TCP_MODE:
+        sock.send(bytearray(data))
+      else:
+        sock.sendall(data)
       data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
   logger.info("Data sent.")
@@ -76,6 +86,5 @@ def unpack_remote_host(remote_host):
 
   return (username, hostname, port)
 
-main.__annotations__ = dict(recursive = ('prints', 'flag', 'r'))
 if __name__ == '__main__':
-  import plac; plac.call(main)
+  plac.call(main)

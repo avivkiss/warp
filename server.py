@@ -14,13 +14,18 @@ import sys
 import os.path
 import shutil
 from udt4py import UDTSocket
+import plac
 
 logger.propagate = False
 
-def main(nonce, filepath, file_hash, file_size, client_path):
+@plac.annotations(tcp_mode=('TCP mode', 'flag', 't'))
+def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode):
   """
   Open a port and wait for connection, write to data to filename.
   """
+
+  TCP_MODE = tcp_mode
+
   sock = get_socket()
   # sys.stderr.write("here\n")
   port = sock.getsockname()[1]
@@ -46,15 +51,21 @@ def main(nonce, filepath, file_hash, file_size, client_path):
 
   write_history(history)
   
-  udt_sock = UDTSocket()
-  udt_sock.bind(sock.fileno())
-  udt_sock.listen()
-  conn, addr = udt_sock.accept()
-  logger.info('Connected by %s', addr)
+  if not TCP_MODE:
+    udt_sock = UDTSocket()
+    udt_sock.bind(sock.fileno())
+    udt_sock.listen()
+    conn, addr = udt_sock.accept()
+    logger.info('Connected by %s', addr)
 
-  recvd_nonce = bytearray(NONCE_SIZE) 
-  conn.recv(recvd_nonce)
-  recvd_nonce = str(recvd_nonce)
+    recvd_nonce = bytearray(NONCE_SIZE) 
+    conn.recv(recvd_nonce)
+    recvd_nonce = str(recvd_nonce)
+  else: 
+    conn, addr = sock.accept()
+    logger.info('Connected by %s', addr)
+
+    recvd_nonce = conn.recv(NONCE_SIZE)
 
   if recvd_nonce != nonce:
     fail("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
@@ -80,13 +91,22 @@ def recieve_data(conn, output_file, block_count, file_size):
 
   size = block_count * CHUNK_SIZE
   data = bytearray(CHUNK_SIZE)
-  while 1:
-    len_rec = conn.recv(data)
-    data = str(data)
-    output_file.write(data[:len_rec])
-    size = size + len_rec
 
-    if len_rec == 0 or str(size) == str(file_size): break
+  if not TCP_MODE:
+    while 1:
+      len_rec = conn.recv(data)
+      data = str(data)
+      output_file.write(data[:len_rec])
+      size = size + len_rec
+
+      if len_rec == 0 or str(size) == str(file_size): break
+  else:
+    while 1:
+      data = conn.recv(CHUNK_SIZE)
+      output_file.write(data)
+      size = size + len(data)
+      if len(data) == 0: break
+
 
   return size
 
@@ -182,13 +202,19 @@ def get_socket():
 
   s = None
 
+  if TCP_MODE:
+    sock_type = socket.SOCK_STREAM
+  else:
+    sock_type = socket.SOCK_DGRAM
+
   try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s = socket.socket(socket.AF_INET, sock_type)
   except socket.error as msg:
     fail(msg)
   try:
     s.bind(('', 0))
-    # s.listen(1)
+    if TCP_MODE:
+      s.listen(1)
   except socket.error as msg:
     s.close()
     fail(str(msg))
@@ -197,4 +223,4 @@ def get_socket():
 
 
 if __name__ == '__main__':
-  import plac; plac.call(main)
+  plac.call(main)
