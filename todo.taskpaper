@@ -10,11 +10,12 @@ General:
 	- refactor
 		- make big methods into smaller ones
 Aviv:
-	- TCP option @done
-	- SSH exception (agent forwarding)
-	- instructions
-		- add udt4py to pip requirements
 Noah:
 	- Error handling
 	- partial file transfer fix
 	- file transfer func 
+Archive:
+	- TCP option @done @project(Aviv)
+	- SSH exception (agent forwarding) @done @project(Aviv)
+	- instructions @done @project(Aviv)
+		- add udt4py to pip requirements @done
