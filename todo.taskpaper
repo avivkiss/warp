@@ -1,6 +1,8 @@
 A todo list in taskpaper format, try taskpaper from the Mac App store  or install plaintasks in Sublime Text.
 
 Aviv:
+	- verify hash on recv files
+	- ssh known hosts issue
 	- version number handshake
 	- transfer specific log files
 	- make sure some output happens

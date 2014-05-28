@@ -79,8 +79,8 @@ def recieve_data(conn, output_file, block_count, file_size):
   output_file.seek(block_count * CHUNK_SIZE)
 
   size = block_count * CHUNK_SIZE
+  data = bytearray(CHUNK_SIZE)
   while 1:
-    data = bytearray(CHUNK_SIZE)
     len_rec = conn.recv(data)
     data = str(data)
     output_file.write(data[:len_rec])

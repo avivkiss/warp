@@ -44,6 +44,7 @@ def send_data(sock, file_src, block_count = 0):
   with progress.Bar(label="", expected_size=os.path.getsize(file_src)) as bar:
     while data :
       bar.show(f.tell())
+      # TODO make this same array every time
       sock.send(bytearray(data))
       data = f.read(CHUNK_SIZE)
   # print "Sent " + str(sent) + " bytes." 
