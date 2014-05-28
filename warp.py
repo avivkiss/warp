@@ -17,7 +17,10 @@ import plac
 def main(remote_host, recursive, file_src, file_dest, tcp_mode):
   (head, tail) = os.path.split(file_src)
 
+  global TCP_MODE
   TCP_MODE = tcp_mode
+
+  logger.info("Using TCP: " + str(TCP_MODE))
 
   if os.path.isdir(file_src) and not recursive:
     logger.error("%s is a directory", file_src)
@@ -35,7 +38,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode):
   # handshake should be returning a tuple, port and numblocks TODO
   sock, block_count = handshake(username=username, hostname=hostname, \
     nonce=nonce, file_dest=file_dest, file_hash=file_hash, \
-    file_size=os.path.getsize(file_src), file_src=file_src)
+    file_size=os.path.getsize(file_src), file_src=file_src, tcp_mode=tcp_mode)
 
   send_data(sock, file_src, block_count)
 
