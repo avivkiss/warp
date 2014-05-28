@@ -9,7 +9,7 @@ version numbers so that client and server only talk to same versions of each
 other.  
 
 ### Introduction
-This readme aims to be both a source of documentation and a development plan
+This file aims to be both a source of documentation and a development plan
 for the *warp* project. Warp aims to provide fast file transfer over UDT. 
 The project will be implemented in Python 2.7 and at the moment using TCP.
 
