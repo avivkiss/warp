@@ -10,7 +10,7 @@ General:
 	- refactor
 		- make big methods into smaller ones
 Aviv:
-	- TCP option
+	- TCP option @done
 	- SSH exception (agent forwarding)
 	- instructions
 		- add udt4py to pip requirements
