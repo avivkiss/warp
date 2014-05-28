@@ -27,6 +27,7 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
   try:
     client = SSHClient()
     client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
       client.connect(hostname, username=username, port=port)
