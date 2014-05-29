@@ -74,14 +74,18 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode):
 
   size = recieve_data(conn, output_file, block_count, file_size)
   
+  output_file.close()
   if str(size) == file_size:
     logger.info("finished")
     del history[file_hash]
+    if not file_hash == getHash(filepath):
+      logger.info("error: files do not match")
+    else:
+      logger.info("files match")
 
   # Write the new history that does not include this transfer
   write_history(history)
 
-  output_file.close()
   conn.close()
 
 def recieve_data(conn, output_file, block_count, file_size):
@@ -157,7 +161,6 @@ def get_file_and_state(filepath, old_path):
       output_file = open(filepath, "r+")
   else:
     output_file = open(filepath, "w")
-    block_count = 0
 
   return block_count, output_file
 
