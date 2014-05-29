@@ -50,19 +50,22 @@ def send_data(sock, file_src, block_count = 0):
   f = open(file_src, 'r')
   f.seek(block_count * CHUNK_SIZE)
   data = f.read(CHUNK_SIZE)
-
   with progress.Bar(label="", expected_size=os.path.getsize(file_src)) as bar:
     while data :
       bar.show(f.tell())
       # TODO make this same array every time
       if not TCP_MODE:
-        sock.send(bytearray(data))
+        sendChunk(sock, bytearray(data))
       else:
         sock.sendall(data)
       data = f.read(CHUNK_SIZE)
-  # print "Sent " + str(sent) + " bytes." 
   logger.info("Data sent.")
   sock.close()
+
+def sendChunk(sock, data):
+  size = sock.send(data)
+  if not size == len(data):
+    sendChunk(sock, data[size:])
 
 def generate_nonce(length=NONCE_SIZE):
   """Generate pseudorandom number. Ripped from google."""
