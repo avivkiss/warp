@@ -31,7 +31,7 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
 
     try:
       client.connect(hostname, username=username, port=port)
-    except (paramiko.PasswordRequiredException, paramiko.AuthenticationException):
+    except (paramiko.PasswordRequiredException, paramiko.AuthenticationException, paramiko.ssh_exception.SSHException):
       password = getpass.getpass('Password for %s@%s: ' % (username, hostname))
       client.connect(hostname, username=username, port=port, password=password)
       
