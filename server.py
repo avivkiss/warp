@@ -85,8 +85,12 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode):
 
   # Write the new history that does not include this transfer
   write_history(history)
-
   conn.close()
+
+  if not TCP_MODE:
+    udt_sock.close()
+
+  os._exit(0)
 
 def recieve_data(conn, output_file, block_count, file_size):
   """
