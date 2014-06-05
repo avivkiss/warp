@@ -13,8 +13,9 @@ import plac
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
-    recursive = ('prints', 'flag', 'r'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode):
+    recursive = ('prints', 'flag', 'r'),
+    disable_verify = ('Disable verify', 'flag', 'v'))
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify):
   (head, tail) = os.path.split(file_src)
 
   global TCP_MODE
@@ -38,7 +39,8 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode):
   # handshake should be returning a tuple, port and numblocks TODO
   sock, block_count = handshake(username=username, hostname=hostname, \
     nonce=nonce, file_dest=file_dest, file_hash=file_hash, \
-    file_size=os.path.getsize(file_src), file_src=file_src, tcp_mode=tcp_mode)
+    file_size=os.path.getsize(file_src), file_src=file_src, tcp_mode=tcp_mode, \
+    disable_verify=disable_verify)
 
   send_data(sock, file_src, block_count)
 

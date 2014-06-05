@@ -18,8 +18,9 @@ import plac
 
 logger.propagate = False
 
-@plac.annotations(tcp_mode=('TCP mode', 'flag', 't'))
-def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode):
+@plac.annotations(tcp_mode=('TCP mode', 'flag', 't'),
+                  disable_verify=('Disable verify', 'flag', 'v'))
+def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode, disable_verify):
   """
   Open a port and wait for connection, write to data to filename.
   """
@@ -78,10 +79,11 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode):
   if str(size) == file_size:
     logger.info("finished")
     del history[file_hash]
-    if not file_hash == getHash(filepath):
-      logger.info("error: files do not match")
-    else:
-      logger.info("files match")
+    if not disable_verify:
+        if not file_hash == getHash(filepath):
+          logger.info("error: files do not match")
+        else:
+          logger.info("files match")
 
   # Write the new history that does not include this transfer
   write_history(history)

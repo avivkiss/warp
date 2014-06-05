@@ -14,7 +14,7 @@ hostkey = None
 logging.getLogger("paramiko").setLevel(logging.WARNING)
 
 def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
-              file_src, port=22, password=None, tcp_mode=False):
+              file_src, port=22, password=None, tcp_mode=False, disable_verify=False):
   """
   Goal of the handshake is to return an authed TCP connection. Expects
   executable for alias warp, for now will return (port, block_count) tuple.
@@ -40,11 +40,13 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     stdout_path = "/var/tmp/" + str(file_hash) + ".out"
 
     if TCP_MODE:
-      tcp_mode_str = ' -t '
+      flags_str = ' -t '
     else:
-      tcp_mode_str = ''
+      flags_str = ''
+    if disable_verify:
+      flags_str += ' -v '
 
-    command = 'warp-server ' + tcp_mode_str + str(nonce) + ' ' + \
+    command = 'warp-server ' + flags_str + str(nonce) + ' ' + \
      file_dest + ' ' + str(file_hash) + ' ' + str(file_size) + ' '+ file_src + \
        ' 2> ' + stderr_path + ' > ' + stdout_path
     stdin, stdout, stderr = client.exec_command(command)
