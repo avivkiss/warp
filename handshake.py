@@ -33,7 +33,11 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
       client.connect(hostname, username=username, port=port)
     except (paramiko.PasswordRequiredException, paramiko.AuthenticationException, paramiko.ssh_exception.SSHException):
       password = getpass.getpass('Password for %s@%s: ' % (username, hostname))
-      client.connect(hostname, username=username, port=port, password=password)
+      try:
+        client.connect(hostname, username=username, port=port, password=password)
+      except paramiko.AuthenticationException as message:
+        logger.error('Permission denied')
+        sys.exit(1)
       
 
     stderr_path = "/var/tmp/" + str(file_hash) + ".err"
