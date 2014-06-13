@@ -9,7 +9,7 @@ LOG_LEVEL = logging.INFO
 logging.basicConfig(format='%(levelname)s: %(message)s', level=LOG_LEVEL)
 
 # Port number to use for the control connection
-CONTROL_PORT = 2351
+CONTROL_PORT = 2352
 
 # Just a random chunk size to send the file in pieces,
 # should be the same as the chunk size used to write
