@@ -48,7 +48,7 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode, disable_v
   print partial_file_hash
   
   background()
-    
+
   if file_hash not in history:
     history[file_hash] = {'path' : filepath}
 
@@ -91,6 +91,22 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode, disable_v
 
   if not TCP_MODE:
     udt_sock.close()
+
+  logger.info("here...")
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  logger.info("here...")
+  s.bind(('localhost', CONTROL_PORT))
+  logger.info("here...")
+  s.listen(1)
+  logger.info("here...")
+  client, address = s.accept()
+  logger.info("here...")
+  data = client.recv(1024)
+  logger.info("now here...")
+  client.send("Hello world")
+  client.close()
+  logger.info("got this: " + str(data))
+  s.close()
 
   os._exit(0)
 

@@ -94,7 +94,7 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     forward_thread = threading.Thread(target=start_tunnel, args=(server,))
     forward_thread.start()
 
-    return sock, block_count, server, forward_thread
+    return sock, block_count, server, forward_thread, client
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection

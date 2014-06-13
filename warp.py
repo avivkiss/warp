@@ -10,6 +10,8 @@ import random, os.path
 from handshake import handshake
 from clint.textui import progress
 import plac
+import socket
+import time
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
@@ -37,7 +39,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify):
   nonce = generate_nonce()
   file_hash = getHash(file_src)
   # handshake should be returning a tuple, port and numblocks TODO
-  sock, block_count, server, thread = handshake(username=username, hostname=hostname, \
+  sock, block_count, server, thread, client = handshake(username=username, hostname=hostname, \
     nonce=nonce, file_dest=file_dest, file_hash=file_hash, \
     file_size=os.path.getsize(file_src), file_src=file_src, tcp_mode=tcp_mode, \
     disable_verify=disable_verify)
@@ -48,6 +50,14 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify):
     print "alive"
   else:
     print "not alive"
+
+  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  s.connect(('localhost', CONTROL_PORT))
+  s.send('Hello, world')
+  data = s.recv(1024)
+  s.close()
+  print "sent"
+  print "got ", data
   server.shutdown()
   server.socket.close()
 
