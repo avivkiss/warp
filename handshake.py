@@ -2,9 +2,11 @@
 import sys, traceback
 from config import *
 from common_tools import *
+from forward import *
 from paramiko import SSHClient, SFTPClient
 import socket, paramiko, getpass
 from udt4py import UDTSocket
+import threading
 
 
 hostkeytype = None
@@ -38,7 +40,6 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
       except paramiko.AuthenticationException as message:
         logger.error('Permission denied')
         sys.exit(1)
-      
 
     stderr_path = "/var/tmp/" + str(file_hash) + ".err"
     stdout_path = "/var/tmp/" + str(file_hash) + ".out"
@@ -87,7 +88,13 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
 
 
     error_check(sftp, stderr_path)
-    return sock, block_count
+
+    # Now we start the port forwarding
+    server = forward_tunnel(CONTROL_PORT, hostname, CONTROL_PORT, client.get_transport())
+    forward_thread = threading.Thread(target=start_tunnel, args=(server,))
+    forward_thread.start()
+
+    return sock, block_count, server, forward_thread
 
   except Exception as e:
     # Boiler plate code from paramiko to handle excepntions for ssh connection
@@ -99,6 +106,10 @@ def handshake(username, hostname, nonce, file_dest, file_hash, file_size,
     except:
       pass
     sys.exit(1)
+
+def start_tunnel(server):
+  print "starting a tunnel"
+  server.serve_forever()
 
 @timeout(30, os.strerror(errno.ETIMEDOUT))
 def wait_for_output(sftp, stdout_path, stderr_path):

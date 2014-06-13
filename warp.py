@@ -37,12 +37,19 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify):
   nonce = generate_nonce()
   file_hash = getHash(file_src)
   # handshake should be returning a tuple, port and numblocks TODO
-  sock, block_count = handshake(username=username, hostname=hostname, \
+  sock, block_count, server, thread = handshake(username=username, hostname=hostname, \
     nonce=nonce, file_dest=file_dest, file_hash=file_hash, \
     file_size=os.path.getsize(file_src), file_src=file_src, tcp_mode=tcp_mode, \
     disable_verify=disable_verify)
 
   send_data(sock, file_src, block_count)
+
+  if(thread.is_alive()):
+    print "alive"
+  else:
+    print "not alive"
+  server.shutdown()
+  server.socket.close()
 
 def send_data(sock, file_src, block_count = 0):
   """
