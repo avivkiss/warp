@@ -46,18 +46,13 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify):
 
   send_data(sock, file_src, block_count)
 
-  if(thread.is_alive()):
-    print "alive"
-  else:
-    print "not alive"
-
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   s.connect(('localhost', CONTROL_PORT))
-  s.send('Hello, world')
+  s.send('finish')
   data = s.recv(1024)
   s.close()
-  print "sent"
-  print "got ", data
+  if str(data) == '1' :
+    logger.info("Finished transfer")
   server.shutdown()
   server.socket.close()
 

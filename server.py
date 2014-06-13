@@ -87,28 +87,22 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode, disable_v
 
   # Write the new history that does not include this transfer
   write_history(history)
-  conn.close()
 
-  if not TCP_MODE:
-    udt_sock.close()
-
-  logger.info("here...")
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  logger.info("here...")
-  s.bind(('localhost', CONTROL_PORT))
-  logger.info("here...")
+  s.bind(('', CONTROL_PORT))
   s.listen(1)
-  logger.info("here...")
   client, address = s.accept()
-  logger.info("here...")
   data = client.recv(1024)
-  logger.info("now here...")
-  client.send("Hello world")
-  client.close()
   logger.info("got this: " + str(data))
-  s.close()
+  if str(data) == 'finish':
+    conn.close()
 
-  os._exit(0)
+    if not TCP_MODE:
+      udt_sock.close()
+    client.send("1")
+    client.close()
+    s.close()
+    os._exit(0)
 
 def recieve_data(conn, output_file, block_count, file_size):
   """
