@@ -30,7 +30,6 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode, disable_v
   logger.info("Using TCP: " + str(TCP_MODE))
 
   sock = get_socket()
-  # sys.stderr.write("here\n")
   port = sock.getsockname()[1]
   
   print port
@@ -92,6 +91,8 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode, disable_v
   if not TCP_MODE:
     udt_sock.close()
 
+  sock.close()
+
   os._exit(0)
 
 def recieve_data(conn, output_file, block_count, file_size):
@@ -128,6 +129,7 @@ def background():
   """
   logger.info("Entering background.")
   if os.fork():
+    sock.close()
     sys.exit()
 
 def write_history(history):
