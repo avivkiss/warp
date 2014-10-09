@@ -1,15 +1,22 @@
 A todo list in taskpaper format, try taskpaper from the Mac App store  or install plaintasks in Sublime Text.
 
 General:
+	- things with incorrect hashes should be restarted
 	- verify hash on recv files
+	- option for symlinks
+	- option to not verify
 	- ssh known hosts issue
 	- version number handshake
 	- transfer specific log files
 	- more like FTP
+	- send back 128 bit offset
 	- make sure some output happens
 	- refactor
 		- make big methods into smaller ones
 Aviv:
+	- fix way socket is created
+	- comm protocol and reach for file recursive file transfer  
+
 Noah:
 	- Error handling
 	- partial file transfer fix
