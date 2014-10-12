@@ -14,6 +14,7 @@ CHUNK_SIZE = 4096
 TRANSACTION_HISTORY_FILENAME = "transaction_history.warp"
 NONCE_SIZE = 32
 TCP_MODE = False
+PORT = 29979
 
 
 def get_file_logger(logger_name, filepath="/var/tmp/warp.log"):
