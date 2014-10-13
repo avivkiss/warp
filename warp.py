@@ -14,11 +14,11 @@ import plac
     tcp_mode=('TCP mode', 'flag', 't'),
     recursive = ('prints', 'flag', 'r'),
     disable_verify = ('Disable verify', 'flag', 'v'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify):
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, custom_comm_port=PORT):
   (head, tail) = os.path.split(file_src)
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
 
-  connection = Connection(username, hostname, ssh_port)
+  connection = Connection(username, hostname, ssh_port, custom_comm_port)
   connection.connect()
 
   channel = connection.getChannel()
