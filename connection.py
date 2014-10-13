@@ -44,7 +44,7 @@ class Connection:
     self.connect_ssh()
 
     # Now we start the port forwarding
-    server = forward_tunnel(self.port, self.hostname, self.port, self.client.get_transport())
+    server = forward_tunnel(self.port, '127.0.0.1', self.port, self.client.get_transport())
     forward_thread = threading.Thread(target=start_tunnel, args=(server,))
     forward_thread.start()
 
@@ -77,5 +77,4 @@ class Connection:
 
 
 def start_tunnel(server):
-  logger.info("Starting tunnel")
   server.serve_forever()
