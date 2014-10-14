@@ -27,7 +27,6 @@ def main(nonce, filepath, file_hash, file_size, client_path, tcp_mode, disable_v
 
   global TCP_MODE 
   TCP_MODE = tcp_mode
-  logger.info("Using TCP: " + str(TCP_MODE))
 
   sock = get_socket()
   port = sock.getsockname()[1]
