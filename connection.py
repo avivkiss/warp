@@ -29,9 +29,6 @@ class Connection:
     self.client = SSHClient()
     self.client.load_system_host_keys()
     self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    print self.hostname
-    print self.username
-    print self.ssh_port
 
     try:
       self.client.connect(self.hostname, username=self.username, port=self.ssh_port)
