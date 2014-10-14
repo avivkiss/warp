@@ -1,14 +1,14 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
 
 """
-This is the server script that will be started by client over SSH, it takes 
+This is the server script that will be started by client over SSH, it takes
 two arguments...
 """
 
 from config import *
 from common_tools import *
-from server_transfer_controller import ServerTransferControllerx
+from server_transfer_controller import ServerTransferController
 import plac
 
 from SocketServer import ThreadingMixIn
