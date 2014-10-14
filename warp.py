@@ -23,7 +23,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
 
   channel = connection.getChannel()
 
-  controller = ClientTransferController(channel, file_src, file_dest, recursive, tcp_mode, disable_verify)
+  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify)
 
   controller.start()
   controller.close()

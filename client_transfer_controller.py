@@ -1,9 +1,12 @@
 
 from common_tools import *
+from client_udt_manager import ClientUDTManager
+import os
 
 class ClientTransferController:
-  def __init__(self, server_channel, file_src, file_dest, recursive, tcp_mode, disable_verify):
+  def __init__(self, server_channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify):
     self.server_channel = server_channel
+    self.hostname = hostname
     self.file_src = file_src
     self.file_dest = file_dest
     self.recursive = recursive
@@ -11,9 +14,23 @@ class ClientTransferController:
     global TCP_MODE
     TCP_MODE = tcp_mode
 
-  def start(): pass
+  def start(): 
+    udt = ClientUDTManager(self.server_channel, self.hostname)
+    transfer_manager = self.server_channel.transfer_manager
 
-  def clost(): 
+
+    file_path = transfer_manager.validate_filepath(self.file_src, self.file_dest)
+    file_hash, block_count = transfer_manager.get_hash_and_blocks(file_path)
+
+    if not verify_partial_hash(self.file_src, file_hash, block_count):
+      transfer_manager.overwrite_file(file_path)
+      block_count = 0
+
+    udt.connect()
+    udt.send_file(self.file_src, file_path, block_count, os.path.getsize(file_src))
+
+
+  def close(): 
     """
     Cleanup goes here, we probably have to close some connections...
     """
@@ -26,5 +43,4 @@ class ClientTransferController:
     """
     my_hash = getHash(file_src, block_count)
     if partial_hash != my_hash:
-      msg = "Partial hash did not match server side. Please remove file from server before transferring.\n"
-      fail(msg)
+      return False

@@ -14,24 +14,24 @@ class TransferManager:
     return os.path.isfile(filepath)
 
   def get_hash_and_blocks(self, filepath):
+    self.get_block_and_init_file_path(filepath)
     file_hash = getHash(filepath)
     block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
 
     return file_hash, block_count 
 
-  def get_block_and_init_file_path(self, filepath, old_path):
+  def overwrite_file(self, filepath):
+    open(filepath, "w").close()
+
+  def get_block_and_init_file_path(self, filepath):
 
     block_count = 0
 
-    if old_path:
-      block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
-      if not os.path.isfile(filepath) or not os.path.samefile(old_path, filepath):
-        output_file = open(filepath, "w")
-        shutil.copyfile(old_path, filepath)
-      else:
-        output_file = open(filepath, "r+")
-    else:
+    block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
+    if not os.path.isfile(filepath):
       output_file = open(filepath, "w")
+    else:
+      output_file = open(filepath, "r+")
 
     output_file.close()
 
