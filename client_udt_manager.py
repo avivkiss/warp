@@ -5,6 +5,7 @@ from common_tools import *
 from paramiko import SSHClient, SFTPClient
 import socket, paramiko, getpass
 from udt4py import UDTSocket
+from server_udt_manager import ServerUDTManager
 
 class ClientUDTManager:
   def __init__(self, server_controller, hostname):
@@ -12,6 +13,20 @@ class ClientUDTManager:
     this.socket = None
     this.hostname = hostname
     self.port = None
+    self.nonce = None
+
+  def connect(self):
+    self.server_udt_manager = self.server_controller.ServerUDTManager(TCP_MODE)
+
+    self.port, self.nonce = self.server_udt_manager.open_connection()
+
+    self.connect_to_server()
+    self.send_nonce()
+
+
+  def send_file(self, file_src, file_dest, block_count, file_size):
+    self.server_udt_manager.recive_data(file_dest, block_count, file_size)
+    self.send_data(file_src, block_count)
 
   def connect_to_server(self, port):
     """
@@ -65,17 +80,17 @@ class ClientUDTManager:
         bar.show(f.tell())
         # TODO make this same array every time
         if not TCP_MODE:
-          sendChunk(self.socket, bytearray(data))
+          self.send_chunk(bytearray(data))
         else:
           self.socket.sendall(data)
         data = f.read(CHUNK_SIZE)
     logger.info("Data sent.")
     self.socket.close()
 
-  def sendChunk(self, sock, data):
-    size = sock.send(data)
+  def send_chunk(self, data):
+    size = self.sock.send(data)
     if not size == len(data):
-      sendChunk(sock, data[size:])
+      self.send_chunk(data[size:])
 
   def generate_nonce(self, length=NONCE_SIZE):
     """Generate pseudorandom number. Ripped from google."""

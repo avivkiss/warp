@@ -1,5 +1,6 @@
 
+from server_udt_manager import ServerUDTManager
 
 class ServerTransferController:
   def __init__(self):
-    pass
+    self.ServerUDTManager = ServerUDTManager

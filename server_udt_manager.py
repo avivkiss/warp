@@ -8,11 +8,7 @@ from udt4py import UDTSocket
 import threading
 
 class ServerUDTManager:
-  def __init__(self, filepath, file_hash, file_size, client_path, tcp_mode, disable_verify):
-    self.filepath = filepath
-    self.file_hash = file_hash
-    self.file_size = file_size
-    self.client_path = client_path
+  def __init__(self, tcp_mode):
     self.tcp_mode = tcp_mode
 
     self.udt_sock = None
@@ -60,8 +56,8 @@ class ServerUDTManager:
     Receives data and writes it to disk, stops when it is no longer receiving 
     data.
     """
-    def recieve_data_threaded(output_file, block_count, file_size):
-      output_file = open(filepath, "w")
+    def recieve_data_threaded(file_path, block_count, file_size):
+      output_file = open(file_path, "w")
       output_file.seek(block_count * CHUNK_SIZE)
 
       size = block_count * CHUNK_SIZE
