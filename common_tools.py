@@ -2,6 +2,7 @@ from config import *
 import hashlib
 import sys
 
+
 def getHash(file, block_count=0):
   """
   Returns a sha256 hash for the specified file.
@@ -25,7 +26,6 @@ def fail(msg):
   logger.error(msg)
   sys.stderr.write(msg)
   sys.exit(1)
-
 
 
 # from: http://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish

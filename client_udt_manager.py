@@ -1,17 +1,16 @@
 
-import sys, traceback
 from config import *
 from common_tools import *
-from paramiko import SSHClient, SFTPClient
-import socket, paramiko, getpass
+import socket
 from udt4py import UDTSocket
 from server_udt_manager import ServerUDTManager
 
+
 class ClientUDTManager:
   def __init__(self, server_controller, hostname):
-    this.server_controller = server_controller
-    this.socket = None
-    this.hostname = hostname
+    self.server_controller = server_controller
+    self.socket = None
+    self.hostname = hostname
     self.port = None
     self.nonce = None
 
@@ -23,7 +22,6 @@ class ClientUDTManager:
     self.connect_to_server()
     self.send_nonce()
 
-
   def send_file(self, file_src, file_dest, block_count, file_size):
     self.server_udt_manager.recive_data(file_dest, block_count, file_size)
     self.send_data(file_src, block_count)
@@ -32,7 +30,7 @@ class ClientUDTManager:
     """
     Connects to the provided host and port returning a socket object.
     """
-    self.port = port 
+    self.port = port
 
     if TCP_MODE:
       sock_type = socket.SOCK_STREAM
