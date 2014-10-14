@@ -57,7 +57,7 @@ class ServerUDTManager:
     data.
     """
     def recieve_data_threaded(file_path, block_count, file_size):
-      output_file = open(file_path, "w")
+      output_file = open(file_path, "r+")
       output_file.seek(block_count * CHUNK_SIZE)
 
       size = block_count * CHUNK_SIZE
