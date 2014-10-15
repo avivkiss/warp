@@ -22,7 +22,7 @@ class ClientTransferController:
     file_path = transfer_manager.validate_filepath(self.file_src, self.file_dest)
     file_hash, block_count = transfer_manager.get_hash_and_blocks(file_path)
 
-    if not verify_partial_hash(self.file_src, file_hash, block_count):
+    if not self.verify_partial_hash(self.file_src, file_hash, block_count):
       transfer_manager.overwrite_file(file_path)
       block_count = 0
 
