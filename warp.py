@@ -11,7 +11,6 @@ from connection import Connection
 from client_transfer_controller import ClientTransferController
 import plac
 
-
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
     recursive = ('prints', 'flag', 'r'),
@@ -27,7 +26,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   connection = Connection(hostname=hostname, username=username, ssh_port=ssh_port, comm_port=custom_comm_port)
   connection.connect()
 
-  # get the xmlrpc channel
+  # get the rpc channel
   channel = connection.getChannel()
 
   controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify)

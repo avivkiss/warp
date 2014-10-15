@@ -4,8 +4,9 @@ from config import *
 from common_tools import *
 from paramiko import SSHClient
 import paramiko, getpass
-import threading, xmlrpclib
+import threading
 from forward import *
+import rpyc
 
 hostkeytype = None
 hostkey = None
@@ -48,7 +49,7 @@ class Connection:
     forward_thread = threading.Thread(target=start_tunnel, args=(server,))
     forward_thread.start()
 
-    self.server = xmlrpclib.ServerProxy('http://localhost:' + str(self.comm_port))
+    self.server = rpyc.connect("localhost", port=self.comm_port, config={"allow_public_attrs": True})
 
     return self.server
 

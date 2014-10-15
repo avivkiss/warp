@@ -1,7 +1,7 @@
 
 from config import *
-import json
 from common_tools import *
+
 
 class TransferManager:
   def __init__(self):
@@ -18,7 +18,7 @@ class TransferManager:
     file_hash = getHash(filepath)
     block_count = (os.path.getsize(old_path)) / CHUNK_SIZE
 
-    return file_hash, block_count 
+    return file_hash, block_count
 
   def overwrite_file(self, filepath):
     open(filepath, "w").close()

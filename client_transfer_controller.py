@@ -17,7 +17,7 @@ class ClientTransferController:
 
   def start(self):
     udt = ClientUDTManager(self.server_channel, self.hostname)
-    transfer_manager = self.server_channel.transfer_manager
+    transfer_manager = self.server_channel.root.get_transfer_manager()
 
     file_path = transfer_manager.validate_filepath(self.file_src, self.file_dest)
     file_hash, block_count = transfer_manager.get_hash_and_blocks(file_path)

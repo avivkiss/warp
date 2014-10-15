@@ -7,22 +7,17 @@ two arguments...
 """
 
 from config import *
+from rpyc.utils.server import ThreadedServer
 from common_tools import *
-from server_transfer_controller import ServerTransferController
 import plac
-
-from SocketServer import ThreadingMixIn
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-
-class XMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
-  pass
+from server_transfer_controller import ServerTransferController
 
 logger.propagate = False
 
+
 def main():
-  server = XMLRPCServer(('localhost', PORT))
-  server.register_instance(ServerTransferController())
-  server.serve_forever()
+  server = ThreadedServer(ServerTransferController, hostname='localhost', port=PORT, protocol_config={"allow_public_attrs": True})
+  server.start()
 
 
 if __name__ == '__main__':
