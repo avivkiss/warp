@@ -27,7 +27,6 @@ class TransferManager:
 
     block_count = 0
 
-    block_count = (os.path.getsize(filepath)) / CHUNK_SIZE
     if not os.path.isfile(filepath):
       output_file = open(filepath, "w")
     else:
@@ -35,6 +34,7 @@ class TransferManager:
 
     output_file.close()
 
+    block_count = (os.path.getsize(filepath)) / CHUNK_SIZE
     return block_count
 
   def validate_filepath(self, filepath, client_path):

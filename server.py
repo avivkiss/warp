@@ -12,7 +12,7 @@ from common_tools import *
 import plac
 from server_transfer_controller import ServerTransferController
 
-logger.propagate = False
+logger.propagate = True
 
 
 def main():
