@@ -43,8 +43,9 @@ class Connection:
 
     # Now we start the port forwarding
     channel = forward_tunnel(self.comm_port, '127.0.0.1', self.comm_port, self.client.get_transport())
-    forward_thread = threading.Thread(target=start_tunnel, args=(channel,))
-    forward_thread.start()
+    self.forward_thread = threading.Thread(target=start_tunnel, args=(channel,))
+    self.forward_thread.setDaemon(True)
+    self.forward_thread.start()
 
     self.channel = rpyc.connect("localhost", port=self.comm_port, config={"allow_public_attrs": True})
 
@@ -52,6 +53,7 @@ class Connection:
 
   def close(self):
     pass
+    # self.forward_thread.exit()
 
   @staticmethod
   def unpack_remote_host(remote_host):
