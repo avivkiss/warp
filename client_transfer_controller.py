@@ -27,7 +27,7 @@ class ClientTransferController:
       block_count = 0
 
     udt.connect()
-    udt.send_file(self.file_src, file_path, block_count, os.path.getsize(file_src))
+    udt.send_file(self.file_src, file_path, block_count, os.path.getsize(self.file_src))
 
   def close(self):
     """

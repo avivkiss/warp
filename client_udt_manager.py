@@ -15,7 +15,7 @@ class ClientUDTManager:
     self.nonce = None
 
   def connect(self):
-    self.server_udt_manager = self.server_controller.ServerUDTManager(TCP_MODE)
+    self.server_udt_manager = self.server_controller.root.get_udt_manager()(TCP_MODE)
 
     self.port, self.nonce = self.server_udt_manager.open_connection()
 
@@ -26,11 +26,10 @@ class ClientUDTManager:
     self.server_udt_manager.recive_data(file_dest, block_count, file_size)
     self.send_data(file_src, block_count)
 
-  def connect_to_server(self, port):
+  def connect_to_server(self):
     """
     Connects to the provided host and port returning a socket object.
     """
-    self.port = port
 
     if TCP_MODE:
       sock_type = socket.SOCK_STREAM
@@ -52,17 +51,17 @@ class ClientUDTManager:
         break
 
     else:
-      sock = UDTSocket()
-      sock.connect((socket.gethostbyname(hostname), port))
+      self.socket = UDTSocket()
+      self.socket.connect((socket.gethostbyname(self.hostname), self.port))
 
-    if this.socket is None:
+    if self.socket is None:
       fail('Could not connect to' + self.hostname)
 
-  def send_nonce(self, nonce):
+  def send_nonce(self):
     if not TCP_MODE:
-      sock.send(bytearray(nonce))
+      self.socket.send(bytearray(self.nonce))
     else:
-      sock.sendall(nonce)
+      self.socket.sendall(self.nonce)
 
 
   def send_data(self, file_src, block_count = 0):

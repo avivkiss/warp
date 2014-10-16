@@ -4,6 +4,7 @@ from config import *
 from common_tools import *
 from paramiko import SSHClient, SFTPClient
 import socket, paramiko, getpass
+import random
 from udt4py import UDTSocket
 import threading
 
@@ -22,11 +23,11 @@ class ServerUDTManager:
     self.nonce = self.generate_nonce()
 
 
-  def open_connection():
+  def open_connection(self):
     if not TCP_MODE:
-      udt_sock = UDTSocket()
-      udt_sock.bind(sock.fileno())
-      udt_sock.listen()
+      self.udt_sock = UDTSocket()
+      self.udt_sock.bind(self.sock.fileno())
+      self.udt_sock.listen()
 
     listening_thread = threading.Thread(target=self.accept_and_verify)
     listening_thread.start()
@@ -34,16 +35,16 @@ class ServerUDTManager:
     return (self.port, self.nonce)
 
 
-  def accept_and_verify():
+  def accept_and_verify(self):
     if not TCP_MODE:
-      self.conn, addr = udt_sock.accept()
+      self.conn, addr = self.udt_sock.accept()
       logger.info('Connected by %s', addr)
 
       recvd_nonce = bytearray(NONCE_SIZE) 
       self.conn.recv(recvd_nonce)
       recvd_nonce = str(recvd_nonce)
     else: 
-      self.conn, addr = sock.accept()
+      self.conn, addr = self.sock.accept()
       logger.info('Connected by %s', addr)
 
       recvd_nonce = self.conn.recv(NONCE_SIZE)
@@ -51,7 +52,7 @@ class ServerUDTManager:
     if recvd_nonce != nonce:
       fail("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
 
-  def recieve_data(output_file, block_count, file_size):
+  def recieve_data(self, output_file, block_count, file_size):
     """
     Receives data and writes it to disk, stops when it is no longer receiving 
     data.

@@ -17,14 +17,11 @@ logging.getLogger("paramiko").setLevel(logging.WARNING)
 
 class Connection:
   def __init__(self, hostname, username, ssh_port=22, comm_port=PORT):
-    self.server = None
+    self.channel = None
     self.hostname = hostname
     self.username = username
     self.comm_port = comm_port
     self.ssh_port = ssh_port
-
-  def getChannel(self):
-    return self.server
 
   def connect_ssh(self):
     self.client = SSHClient()
@@ -45,13 +42,13 @@ class Connection:
     self.connect_ssh()
 
     # Now we start the port forwarding
-    server = forward_tunnel(self.comm_port, '127.0.0.1', self.comm_port, self.client.get_transport())
-    forward_thread = threading.Thread(target=start_tunnel, args=(server,))
+    channel = forward_tunnel(self.comm_port, '127.0.0.1', self.comm_port, self.client.get_transport())
+    forward_thread = threading.Thread(target=start_tunnel, args=(channel,))
     forward_thread.start()
 
-    self.server = rpyc.connect("localhost", port=self.comm_port, config={"allow_public_attrs": True})
+    self.channel = rpyc.connect("localhost", port=self.comm_port, config={"allow_public_attrs": True})
 
-    return self.server
+    return self.channel
 
   def close(self):
     pass
@@ -79,5 +76,5 @@ class Connection:
     return (username, hostname, port)
 
 
-def start_tunnel(server):
-  server.serve_forever()
+def start_tunnel(channel):
+  channel.serve_forever()

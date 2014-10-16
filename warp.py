@@ -27,7 +27,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   connection.connect()
 
   # get the rpc channel
-  channel = connection.getChannel()
+  channel = connection.channel
 
   controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify)
 
