@@ -10,6 +10,7 @@ import os.path
 from connection import Connection
 from client_transfer_controller import ClientTransferController
 import plac
+import sys
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
@@ -35,6 +36,8 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   controller.close()
 
   connection.close()
+
+  sys.exit()
 
 
 if __name__ == '__main__':

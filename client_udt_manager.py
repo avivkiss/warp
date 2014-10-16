@@ -23,7 +23,7 @@ class ClientUDTManager:
     self.send_nonce()
 
   def send_file(self, file_src, file_dest, block_count, file_size):
-    self.server_udt_manager.recive_data(file_dest, block_count, file_size)
+    self.server_udt_manager.recieve_data(file_dest, block_count, file_size)
     self.send_data(file_src, block_count)
 
   def connect_to_server(self):
@@ -37,16 +37,16 @@ class ClientUDTManager:
       for res in socket.getaddrinfo(self.hostname, port, socket.AF_UNSPEC, sock_type):
         af, socktype, proto, canonname, sa = res
         try:
-          this.socket = socket.socket(af, socktype, proto)
+          self.socket = socket.socket(af, socktype, proto)
         except socket.error:
-          this.socket = None
+          self.socket = None
           continue
         try:
-          this.socket.connect(sa)
+          self.socket.connect(sa)
         except socket.error:
-          this.socket.close()
+          self.socket.close()
           # No need to log error here, some errors are expected
-          this.socket = None
+          self.socket = None
           continue
         break
 
@@ -72,20 +72,18 @@ class ClientUDTManager:
     f = open(file_src, 'r')
     f.seek(block_count * CHUNK_SIZE)
     data = f.read(CHUNK_SIZE)
-    with progress.Bar(label="", expected_size=os.path.getsize(file_src)) as bar:
-      while data :
-        bar.show(f.tell())
-        # TODO make this same array every time
-        if not TCP_MODE:
-          self.send_chunk(bytearray(data))
-        else:
-          self.socket.sendall(data)
-        data = f.read(CHUNK_SIZE)
+    while data :
+      # TODO make this same array every time
+      if not TCP_MODE:
+        self.send_chunk(bytearray(data))
+      else:
+        self.socket.sendall(data)
+      data = f.read(CHUNK_SIZE)
     logger.info("Data sent.")
     self.socket.close()
 
   def send_chunk(self, data):
-    size = self.sock.send(data)
+    size = self.socket.send(data)
     if not size == len(data):
       self.send_chunk(data[size:])
 
@@ -94,4 +92,4 @@ class ClientUDTManager:
     return ''.join([str(random.randint(0, 9)) for i in range(length)])
 
   def __del__(self):
-    this.socket.close()
+    self.socket.close()

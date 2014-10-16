@@ -49,16 +49,16 @@ class ServerUDTManager:
 
       recvd_nonce = self.conn.recv(NONCE_SIZE)
 
-    if recvd_nonce != nonce:
-      fail("Received nonce %s doesn't match %s.", recvd_nonce, nonce)
+    if recvd_nonce != self.nonce:
+      fail("Received nonce %s doesn't match %s.", recvd_nonce, self.nonce)
 
   def recieve_data(self, output_file, block_count, file_size):
     """
     Receives data and writes it to disk, stops when it is no longer receiving 
     data.
     """
-    def recieve_data_threaded(file_path, block_count, file_size):
-      output_file = open(file_path, "r+")
+    def recieve_data_threaded(output_file, block_count, file_size):
+      output_file = open(output_file, "r+")
       output_file.seek(block_count * CHUNK_SIZE)
 
       size = block_count * CHUNK_SIZE
@@ -81,7 +81,7 @@ class ServerUDTManager:
 
       output_file.close()
 
-    thread = threading.Thread(target=recieve_data_threaded)
+    thread = threading.Thread(target=recieve_data_threaded, args=(output_file, block_count, file_size))
     thread.start()
 
     return thread
