@@ -3,7 +3,6 @@ from config import *
 from common_tools import *
 import socket
 from udt4py import UDTSocket
-from server_udt_manager import ServerUDTManager
 
 
 class ClientUDTManager:
@@ -63,8 +62,7 @@ class ClientUDTManager:
     else:
       self.socket.sendall(self.nonce)
 
-
-  def send_data(self, file_src, block_count = 0):
+  def send_data(self, file_src, block_count=0):
     """
     Opens the file at the number of blocks passed in and uses that along with
     the other parameters to send a file to the host at the specified port.
@@ -72,7 +70,7 @@ class ClientUDTManager:
     f = open(file_src, 'r')
     f.seek(block_count * CHUNK_SIZE)
     data = f.read(CHUNK_SIZE)
-    while data :
+    while data:
       # TODO make this same array every time
       if not TCP_MODE:
         self.send_chunk(bytearray(data))
@@ -81,6 +79,7 @@ class ClientUDTManager:
       data = f.read(CHUNK_SIZE)
     logger.info("Data sent.")
     self.socket.close()
+    f.close()
 
   def send_chunk(self, data):
     size = self.socket.send(data)
