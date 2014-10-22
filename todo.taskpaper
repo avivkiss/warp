@@ -3,8 +3,8 @@ A todo list in taskpaper format, try taskpaper from the Mac App store  or instal
 General:
 	- verification
 	- recursive transfer with exposed stat in separate thread 
-	- error handling
-		- if file not present
+	- error handling @done
+		- if file not present @done
 	- progress bar
 	- tcp mode testing
 	- option for symlinks
