@@ -11,6 +11,7 @@ class ClientTransferController:
     self.file_src = file_src
     self.file_dest = file_dest
     self.recursive = recursive
+    self.verify = not disable_verify
 
     global TCP_MODE
     TCP_MODE = tcp_mode
@@ -47,12 +48,13 @@ class ClientTransferController:
     udt.connect()
     udt.send_file(self.file_src, file_path, block_count, os.path.getsize(self.file_src))
 
-    if self.verify_partial_hash(self.file_src, transfer_manager.get_file_hash(file_path), total_block_count):
-      return True
-    else:
-      logger.debug("Could not validate file")
-
-    return False
+    if self.verify:
+      if self.verify_partial_hash(self.file_src, transfer_manager.get_file_hash(file_path), total_block_count):
+        return True
+      else:
+        logger.debug("Could not validate file")
+        return False
+    return True
 
   def file_block_count(self, file_src):
     return (os.path.getsize(file_src) / CHUNK_SIZE)
