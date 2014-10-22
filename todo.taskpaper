@@ -1,7 +1,7 @@
 A todo list in taskpaper format, try taskpaper from the Mac App store  or install plaintasks in Sublime Text.
 
 General:
-	- verification
+	- verification @done
 	- recursive transfer with exposed stat in separate thread 
 	- error handling @done
 		- if file not present @done

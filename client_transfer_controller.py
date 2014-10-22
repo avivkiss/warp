@@ -28,6 +28,7 @@ class ClientTransferController:
     logger.debug("Saving to... " + file_path)
 
     block_count = 0
+    total_block_count = self.file_block_count(self.file_src)
 
     #TODO: figure out what to do if the file you are trying to send is a folder on the server
     if(transfer_manager.is_file(file_path)):
@@ -36,7 +37,7 @@ class ClientTransferController:
         logger.debug("Failed to validate partial hash")
         transfer_manager.overwrite_file(file_path)
         block_count = 0
-      elif self.file_block_count(self.file_src) == block_count:
+      elif total_block_count == block_count:
         logger.debug("File already transfered")
         return True
     else:
@@ -46,7 +47,12 @@ class ClientTransferController:
     udt.connect()
     udt.send_file(self.file_src, file_path, block_count, os.path.getsize(self.file_src))
 
-    return True
+    if self.verify_partial_hash(self.file_src, transfer_manager.get_file_hash(file_path), total_block_count):
+      return True
+    else:
+      logger.debug("Could not validate file")
+
+    return False
 
   def file_block_count(self, file_src):
     return (os.path.getsize(file_src) / CHUNK_SIZE)

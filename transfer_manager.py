@@ -13,6 +13,9 @@ class TransferManager:
   def is_file(self, filepath):
     return os.path.isfile(filepath)
 
+  def get_file_hash(self, filepath):
+    return getHash(filepath)
+
   def get_hash_and_blocks(self, filepath):
     block_count = self.get_block_and_init_file_path(filepath)
     file_hash = getHash(filepath)
