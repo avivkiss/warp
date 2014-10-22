@@ -17,24 +17,37 @@ class ClientTransferController:
     TCP_MODE = tcp_mode
 
   def start(self):
-    if not os.path.isfile(self.file_src):
+    if os.path.isdir(self.file_src) and not self.recursive:
+      logger.debug(str(self.file_src) + " is a directory")
+      return False
+    if os.path.isfile(self.file_src) and self.recursive:
+      logger.debug(str(self.file_src) + " is a file")
+      return False
+    if not os.path.isfile(self.file_src) and not os.path.isdir(self.file_src):
       logger.debug("Source file not found")
       return False
+    if not self.recursive:
+      return self.sendFile(self.file_src)
+    else:
+      # TODO: implement recursive transfer
+      return False
+
+  def sendFile(self, file_name):
     udt = ClientUDTManager(self.server_channel, self.hostname)
     transfer_manager = self.server_channel.root.get_transfer_manager()
 
-    logger.debug("Source " + self.file_src + " Dest: " + self.file_dest)
+    logger.debug("Source " + file_name + " Dest: " + self.file_dest)
 
-    file_path = transfer_manager.validate_filepath(self.file_dest, self.file_src)
+    file_path = transfer_manager.validate_filepath(self.file_dest, file_name)
     logger.debug("Saving to... " + file_path)
 
     block_count = 0
-    total_block_count = self.file_block_count(self.file_src)
+    total_block_count = self.file_block_count(file_name)
 
     #TODO: figure out what to do if the file you are trying to send is a folder on the server
     if(transfer_manager.is_file(file_path)):
       file_hash, block_count = transfer_manager.get_hash_and_blocks(file_path)
-      if not self.verify_partial_hash(self.file_src, file_hash, block_count):
+      if not self.verify_partial_hash(file_name, file_hash, block_count):
         logger.debug("Failed to validate partial hash")
         transfer_manager.overwrite_file(file_path)
         block_count = 0
@@ -46,10 +59,10 @@ class ClientTransferController:
       transfer_manager.overwrite_file(file_path)
 
     udt.connect()
-    udt.send_file(self.file_src, file_path, block_count, os.path.getsize(self.file_src))
+    udt.send_file(file_name, file_path, block_count, os.path.getsize(file_name))
 
     if self.verify:
-      if self.verify_partial_hash(self.file_src, transfer_manager.get_file_hash(file_path), total_block_count):
+      if self.verify_partial_hash(file_name, transfer_manager.get_file_hash(file_path), total_block_count):
         return True
       else:
         logger.debug("Could not validate file")
