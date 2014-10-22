@@ -14,9 +14,8 @@ class TransferManager:
     return os.path.isfile(filepath)
 
   def get_hash_and_blocks(self, filepath):
-    self.get_block_and_init_file_path(filepath)
+    block_count = self.get_block_and_init_file_path(filepath)
     file_hash = getHash(filepath)
-    block_count = (os.path.getsize(filepath)) / CHUNK_SIZE
 
     return file_hash, block_count
 

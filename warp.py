@@ -33,9 +33,12 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify)
 
   logger.debug("Starting transfer")
-  controller.start()
+  success = controller.start()
 
-  logger.debug("Done with transfer.")
+  if success:
+    logger.debug("Done with transfer.")
+  else:
+    logger.debug("Failed to send file.")
 
   controller.close()
   connection.close()

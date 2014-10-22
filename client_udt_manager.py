@@ -91,4 +91,5 @@ class ClientUDTManager:
     return ''.join([str(random.randint(0, 9)) for i in range(length)])
 
   def __del__(self):
-    self.socket.close()
+    if(self.socket):
+      self.socket.close()
