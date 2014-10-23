@@ -9,6 +9,7 @@ class ClientTransferController:
     self.server_channel = server_channel
     self.hostname = hostname
     self.file_src = file_src
+    self.file_root_dest = file_dest
     self.file_dest = file_dest
     self.recursive = recursive
     self.verify = not disable_verify
@@ -27,8 +28,16 @@ class ClientTransferController:
     if not self.recursive:
       return self.sendFile(self.file_src)
     else:
-      # TODO: implement recursive transfer
-      return False
+      transfer_manager = self.server_channel.root.get_transfer_manager()
+      transfer_manager.create_dir(self.file_dest)
+      for dir, subdirs, files in os.walk(self.file_src):
+        transfer_manager.create_dir(os.path.join(self.file_root_dest, dir))
+        for file in files:
+          self.file_dest = os.path.join(self.file_root_dest, dir, file)
+          logger.debug("sending to: " + str(self.file_dest))
+          if not self.sendFile(os.path.join(dir, file)):
+            return False
+      return True
 
   def sendFile(self, file_name):
     udt = ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode)

@@ -19,6 +19,10 @@ class TransferManager:
   def get_blocks(self, filepath):
     return os.path.getsize(filepath) / CHUNK_SIZE
 
+  def create_dir(self, directory):
+    if not os.path.exists(directory):
+      os.makedirs(directory)
+
   def overwrite_file(self, filepath):
     open(filepath, "w").close()
 
