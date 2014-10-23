@@ -32,9 +32,10 @@ class ClientUDTManager:
     """
 
     if self.tcp_mode:
+      logger.info("TCP mode")
       sock_type = socket.SOCK_STREAM
 
-      for res in socket.getaddrinfo(self.hostname, port, socket.AF_UNSPEC, sock_type):
+      for res in socket.getaddrinfo(self.hostname, self.port, socket.AF_UNSPEC, sock_type):
         af, socktype, proto, canonname, sa = res
         try:
           self.socket = socket.socket(af, socktype, proto)
