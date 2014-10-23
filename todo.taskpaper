@@ -3,10 +3,10 @@ A todo list in taskpaper format, try taskpaper from the Mac App store  or instal
 General:
 	- recursive transfer with exposed stat in separate thread 
 	- progress bar
-	- tcp mode testing
 	- option for symlinks
 
 Archive:
+	- tcp mode testing @done @project(General)
 	- verification @done @project(General)
 	- error handling @done @project(General)
 		- if file not present @done
