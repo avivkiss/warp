@@ -6,7 +6,6 @@ This is the main driver script that will run on the client.
 
 from config import *
 from common_tools import *
-import os.path
 from connection import Connection
 from client_transfer_controller import ClientTransferController
 import plac

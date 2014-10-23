@@ -13,22 +13,16 @@ class TransferManager:
   def is_file(self, filepath):
     return os.path.isfile(filepath)
 
-  def get_file_hash(self, filepath):
-    return getHash(filepath)
+  def get_file_hash(self, filepath, block_count=0):
+    return getHash(filepath, block_count)
 
-  def get_hash_and_blocks(self, filepath):
-    block_count = self.get_block_and_init_file_path(filepath)
-    file_hash = getHash(filepath)
-
-    return file_hash, block_count
+  def get_blocks(self, filepath):
+    return os.path.getsize(filepath) / CHUNK_SIZE
 
   def overwrite_file(self, filepath):
     open(filepath, "w").close()
 
-  def get_block_and_init_file_path(self, filepath):
-
-    block_count = 0
-
+  def get_size_and_init_file_path(self, filepath):
     if not os.path.isfile(filepath):
       output_file = open(filepath, "w")
     else:
@@ -36,8 +30,7 @@ class TransferManager:
 
     output_file.close()
 
-    block_count = (os.path.getsize(filepath)) / CHUNK_SIZE
-    return block_count
+    return os.path.getsize(filepath)
 
   def validate_filepath(self, filepath, client_path):
     """

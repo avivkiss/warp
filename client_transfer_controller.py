@@ -42,16 +42,19 @@ class ClientTransferController:
     logger.debug("Saving to... " + file_path)
 
     block_count = 0
-    total_block_count = self.file_block_count(file_name)
 
     #TODO: figure out what to do if the file you are trying to send is a folder on the server
-    if(transfer_manager.is_file(file_path)):
-      file_hash, block_count = transfer_manager.get_hash_and_blocks(file_path)
+    server_file_size = transfer_manager.get_size_and_init_file_path(file_path)
+    if(server_file_size > 0):
+      block_count = 0
+      if(server_file_size != os.path.getsize(file_name)):
+        block_count = transfer_manager.get_blocks(file_path)
+      file_hash = transfer_manager.get_file_hash(file_path, block_count)
       if not self.verify_partial_hash(file_name, file_hash, block_count):
         logger.debug("Failed to validate partial hash")
         transfer_manager.overwrite_file(file_path)
         block_count = 0
-      elif total_block_count == block_count:
+      elif block_count == 0:
         logger.debug("File already transfered")
         return True
     else:
@@ -62,7 +65,7 @@ class ClientTransferController:
     udt.send_file(file_name, file_path, block_count, os.path.getsize(file_name))
 
     if self.verify:
-      if self.verify_partial_hash(file_name, transfer_manager.get_file_hash(file_path), total_block_count):
+      if self.verify_partial_hash(file_name, transfer_manager.get_file_hash(file_path)):
         return True
       else:
         logger.debug("Could not validate file")
@@ -78,7 +81,7 @@ class ClientTransferController:
     """
     pass
 
-  def verify_partial_hash(self, file_src, partial_hash, block_count):
+  def verify_partial_hash(self, file_src, partial_hash, block_count=0):
     """
     Takes a file source and hashes the file up to block count and then compares
     it with the partial hash passed in, fails if they do not match.
