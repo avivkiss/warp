@@ -1,12 +1,14 @@
 A todo list in taskpaper format, try taskpaper from the Mac App store  or install plaintasks in Sublime Text.
 
 General:
-	- verification @done
 	- recursive transfer with exposed stat in separate thread 
-	- error handling @done
-		- if file not present @done
 	- progress bar
 	- tcp mode testing
 	- option for symlinks
-	- option to not verify @done
-	- chroot to users home directory (either in server code or when the daemon is started or add ~ automatically) @done
+
+Archive:
+	- verification @done @project(General)
+	- error handling @done @project(General)
+		- if file not present @done
+	- option to not verify @done @project(General)
+	- chroot to users home directory (either in server code or when the daemon is started or add ~ automatically) @done @project(General)

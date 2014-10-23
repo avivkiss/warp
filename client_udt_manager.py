@@ -6,15 +6,16 @@ from udt4py import UDTSocket
 
 
 class ClientUDTManager:
-  def __init__(self, server_controller, hostname):
+  def __init__(self, server_controller, hostname, tcp_mode):
     self.server_controller = server_controller
     self.socket = None
     self.hostname = hostname
     self.port = None
     self.nonce = None
+    self.tcp_mode = tcp_mode
 
   def connect(self):
-    self.server_udt_manager = self.server_controller.root.get_udt_manager()(TCP_MODE)
+    self.server_udt_manager = self.server_controller.root.get_udt_manager()(self.tcp_mode)
 
     self.port, self.nonce = self.server_udt_manager.open_connection()
 
@@ -30,7 +31,7 @@ class ClientUDTManager:
     Connects to the provided host and port returning a socket object.
     """
 
-    if TCP_MODE:
+    if self.tcp_mode:
       sock_type = socket.SOCK_STREAM
 
       for res in socket.getaddrinfo(self.hostname, port, socket.AF_UNSPEC, sock_type):
@@ -57,7 +58,7 @@ class ClientUDTManager:
       fail('Could not connect to' + self.hostname)
 
   def send_nonce(self):
-    if not TCP_MODE:
+    if not self.tcp_mode:
       self.socket.send(bytearray(self.nonce))
     else:
       self.socket.sendall(self.nonce)
@@ -72,7 +73,7 @@ class ClientUDTManager:
     data = f.read(CHUNK_SIZE)
     while data:
       # TODO make this same array every time
-      if not TCP_MODE:
+      if not self.tcp_mode:
         self.send_chunk(bytearray(data))
       else:
         self.socket.sendall(data)

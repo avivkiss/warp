@@ -12,9 +12,7 @@ class ClientTransferController:
     self.file_dest = file_dest
     self.recursive = recursive
     self.verify = not disable_verify
-
-    global TCP_MODE
-    TCP_MODE = tcp_mode
+    self.tcp_mode = tcp_mode
 
   def start(self):
     if os.path.isdir(self.file_src) and not self.recursive:
@@ -33,7 +31,7 @@ class ClientTransferController:
       return False
 
   def sendFile(self, file_name):
-    udt = ClientUDTManager(self.server_channel, self.hostname)
+    udt = ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode)
     transfer_manager = self.server_channel.root.get_transfer_manager()
 
     logger.debug("Source " + file_name + " Dest: " + self.file_dest)

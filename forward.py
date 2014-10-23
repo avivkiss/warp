@@ -29,6 +29,7 @@ connection to a destination reachable from the SSH server machine.
 import getpass
 import os
 import socket
+from config import *
 import select
 try:
     import SocketServer
@@ -103,4 +104,4 @@ def forward_tunnel(local_port, remote_host, remote_port, transport):
 
 def verbose(s):
     if g_verbose:
-        print(s)
+        logger.debug(s)

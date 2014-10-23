@@ -13,15 +13,12 @@ class ServerUDTManager:
     self.udt_sock = None
     self.conn = None
 
-    global TCP_MODE
-    TCP_MODE = tcp_mode
-
     self.sock = self.get_socket()
     self.port = self.sock.getsockname()[1]
     self.nonce = self.generate_nonce()
 
   def open_connection(self):
-    if not TCP_MODE:
+    if not self.tcp_mode:
       self.udt_sock = UDTSocket()
       self.udt_sock.bind(self.sock.fileno())
       self.udt_sock.listen()
@@ -32,7 +29,7 @@ class ServerUDTManager:
     return (self.port, self.nonce)
 
   def accept_and_verify(self):
-    if not TCP_MODE:
+    if not self.tcp_mode:
       self.conn, addr = self.udt_sock.accept()
       logger.info('Connected by %s', addr)
 
@@ -63,7 +60,7 @@ class ServerUDTManager:
       size = block_count * CHUNK_SIZE
       data = bytearray(CHUNK_SIZE)
 
-      if not TCP_MODE:
+      if not self.tcp_mode:
         while 1:
           len_rec = self.conn.recv(data)
           data = str(data)
@@ -95,7 +92,7 @@ class ServerUDTManager:
 
     s = None
 
-    if TCP_MODE:
+    if self.tcp_mode:
       sock_type = socket.SOCK_STREAM
     else:
       sock_type = socket.SOCK_DGRAM
@@ -106,7 +103,7 @@ class ServerUDTManager:
       fail(msg)
     try:
       s.bind(('', 0))
-      if TCP_MODE:
+      if self.tcp_mode:
         s.listen(1)
     except socket.error as msg:
       s.close()
