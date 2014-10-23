@@ -9,4 +9,4 @@ General:
 	- tcp mode testing
 	- option for symlinks
 	- option to not verify @done
-	- chroot to users home directory (either in server code or when the daemon is started or add ~ automatically)
+	- chroot to users home directory (either in server code or when the daemon is started or add ~ automatically) @done
