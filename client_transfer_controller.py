@@ -51,7 +51,7 @@ class ClientTransferController:
         block_count = transfer_manager.get_blocks(file_path)
       file_hash = transfer_manager.get_file_hash(file_path, block_count)
       if not self.verify_partial_hash(file_name, file_hash, block_count):
-        logger.debug("Failed to validate partial hash")
+        logger.debug("Client and server side partial hash differ.")
         transfer_manager.overwrite_file(file_path)
         block_count = 0
       elif block_count == 0:
@@ -68,7 +68,7 @@ class ClientTransferController:
       if self.verify_partial_hash(file_name, transfer_manager.get_file_hash(file_path)):
         return True
       else:
-        logger.debug("Could not validate file")
+        logger.debug("File failed validation check.")
         return False
     return True
 
