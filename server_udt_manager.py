@@ -43,7 +43,7 @@ class ServerUDTManager:
       recvd_nonce = self.conn.recv(NONCE_SIZE)
 
     if recvd_nonce != self.nonce:
-      fail("Received nonce %s doesn't match %s.", recvd_nonce, self.nonce)
+      fail(format("Received nonce %s doesn't match %s.", recvd_nonce, self.nonce))
 
     logger.debug("Nonce verified.")
 
@@ -111,9 +111,6 @@ class ServerUDTManager:
 
     return s
 
-
   def generate_nonce(self, length=NONCE_SIZE):
     """Generate pseudorandom number. Ripped from google."""
     return ''.join([str(random.randint(0, 9)) for i in range(length)])
-
-

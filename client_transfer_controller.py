@@ -34,9 +34,14 @@ class ClientTransferController:
       transfer_manager = self.server_channel.root.get_transfer_manager()
       transfer_manager.create_dir(self.file_dest)
       for directory, subdirs, files in os.walk(self.file_src):
-        transfer_manager.create_dir(os.path.join(self.file_root_dest, directory))
+        # Make sure the directory we use on the server starts where we want it to
+        # Instead of having the same path the client has
+        server_directory = os.path.relpath(directory, self.file_src)
+        if(str(server_directory) == "."):
+          server_directory = ""
+        transfer_manager.create_dir(os.path.join(self.file_root_dest, server_directory))
         for f in files:
-          file_dest = os.path.join(self.file_root_dest, directory, f)
+          file_dest = os.path.join(self.file_root_dest, server_directory, f)
           file_src = os.path.join(directory, f)
           self.all_files.append((file_src, file_dest))
           self.transfer_size += os.path.getsize(file_src)
@@ -56,8 +61,6 @@ class ClientTransferController:
 
   def is_transfer_success(self):
     return self.transfer_status.count(False) == 0
-      
-
 
   def sendFile(self, file_name, file_dest):
     udt = ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode)
