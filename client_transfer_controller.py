@@ -6,7 +6,7 @@ from multiprocessing.pool import ThreadPool
 
 
 class ClientTransferController:
-  def __init__(self, server_channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism):
+  def __init__(self, server_channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links):
     self.server_channel = server_channel
     self.hostname = hostname
     self.file_src = file_src
@@ -19,6 +19,7 @@ class ClientTransferController:
     self.transfer_pool_results = []
     self.parallelism = parallelism
     self.transfer_status = []
+    self.follow_links = follow_links
 
   def start(self):
     if os.path.isdir(self.file_src) and not self.recursive:
@@ -35,7 +36,7 @@ class ClientTransferController:
     else:
       transfer_manager = self.server_channel.root.get_transfer_manager()
       transfer_manager.create_dir(self.file_dest)
-      for directory, subdirs, files in os.walk(self.file_src):
+      for directory, subdirs, files in os.walk(self.file_src, followlinks=self.follow_links):
         # Make sure the directory we use on the server starts where we want it to
         # Instead of having the same path the client has
         server_directory = os.path.relpath(directory, self.file_src)
@@ -56,10 +57,10 @@ class ClientTransferController:
         return False
 
     return True
-    
+
   def is_transfer_success(self):
     return self.transfer_status.count(False) == 0
-      
+
   def send_file_with_status(self, file_name, file_dest):
     self.transfer_status.append(self.send_file(file_name, file_dest))
 

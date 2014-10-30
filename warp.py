@@ -15,8 +15,9 @@ import sys, time
     tcp_mode=('TCP mode', 'flag', 't'),
     recursive = ('Transfer directory', 'flag', 'r'),
     parallelism = ('parallelism', 'option', 'p', int),
-    disable_verify = ('Disable verify', 'flag', 'v'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, custom_comm_port=PORT, parallelism=3):
+    disable_verify = ('Disable verify', 'flag', 'v'),
+    follow_links = ('Follow symbolic links', 'flag', 'L'))
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, follow_links, custom_comm_port=PORT, parallelism=3):
   # Extract the username and hostname from the arguments,
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
@@ -29,7 +30,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   # get the rpc channel
   channel = connection.channel
 
-  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism)
+  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links)
 
   logger.debug("Starting transfer")
   transfer_thread = controller.start()
