@@ -1,11 +1,11 @@
 A todo list in taskpaper format, try taskpaper from the Mac App store  or install plaintasks in Sublime Text.
 
 General:
-	- recursive transfer with exposed stat in separate thread 
 	- progress bar, speed indicator. 
 	- option for symlinks
 	- timestamps and permissions
 	- disable first verification, just using file size.  
+	- option to control parallelism 
 
 Archive:
 	- tcp mode testing @done @project(General)

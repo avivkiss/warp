@@ -13,9 +13,10 @@ import sys, time
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
-    recursive = ('prints', 'flag', 'r'),
+    recursive = ('Transfer directory', 'flag', 'r'),
+    parallelism = ('parallelism', 'option', 'p', int),
     disable_verify = ('Disable verify', 'flag', 'v'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, custom_comm_port=PORT):
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, custom_comm_port=PORT, parallelism=3):
   # Extract the username and hostname from the arguments,
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
@@ -28,7 +29,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   # get the rpc channel
   channel = connection.channel
 
-  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify)
+  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism)
 
   logger.debug("Starting transfer")
   transfer_thread = controller.start()

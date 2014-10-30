@@ -6,7 +6,7 @@ from multiprocessing.pool import ThreadPool
 
 
 class ClientTransferController:
-  def __init__(self, server_channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify):
+  def __init__(self, server_channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism):
     self.server_channel = server_channel
     self.hostname = hostname
     self.file_src = file_src
@@ -17,6 +17,7 @@ class ClientTransferController:
     self.tcp_mode = tcp_mode
     self.transfer_size = 0
     self.all_files = []
+    self.parallelism = parallelism
 
   def start(self):
     if os.path.isdir(self.file_src) and not self.recursive:
@@ -44,7 +45,7 @@ class ClientTransferController:
 
   def start_transfer_async(self):
     def start_transfer_async_t():
-      pool = ThreadPool(processes=POOL_SIZE)
+      pool = ThreadPool(processes=self.parallelism)
       self.transfer_status = pool.map(lambda (x, y): self.sendFile(x, y), self.all_files)
 
     self.transfer_thread = threading.Thread(target=start_transfer_async_t)
