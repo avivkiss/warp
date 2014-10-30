@@ -34,7 +34,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   logger.debug("Starting transfer")
   transfer_thread = controller.start()
 
-  while transfer_thread.isAlive():
+  while not controller.is_transfer_finished():
     time.sleep(0.1)
 
   if not controller.is_transfer_success():

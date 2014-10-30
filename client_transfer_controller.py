@@ -16,8 +16,9 @@ class ClientTransferController:
     self.verify = not disable_verify
     self.tcp_mode = tcp_mode
     self.transfer_size = 0
-    self.all_files = []
+    self.transfer_pool_results = []
     self.parallelism = parallelism
+    self.transfer_status = []
 
   def start(self):
     if os.path.isdir(self.file_src) and not self.recursive:
@@ -27,9 +28,10 @@ class ClientTransferController:
     if not os.path.isfile(self.file_src) and not os.path.isdir(self.file_src):
       fail("Source file not found")
 
+    pool = ThreadPool(processes=self.parallelism)
     if not self.recursive:
       self.transfer_size = os.path.getsize(self.file_src)
-      self.all_files = [(self.file_src, self.file_dest)]
+      self.transfer_pool_results.append(pool.apply_async(self.send_file_with_status, args=(self.file_src, self.file_dest)))
     else:
       transfer_manager = self.server_channel.root.get_transfer_manager()
       transfer_manager.create_dir(self.file_dest)
@@ -43,26 +45,25 @@ class ClientTransferController:
         for f in files:
           file_dest = os.path.join(self.file_root_dest, server_directory, f)
           file_src = os.path.join(directory, f)
-          self.all_files.append((file_src, file_dest))
           self.transfer_size += os.path.getsize(file_src)
+          self.transfer_pool_results.append(pool.apply_async(self.send_file_with_status, args=(file_src, file_dest)))
 
-    return self.start_transfer_async()
+    return pool
 
-  def start_transfer_async(self):
-    def start_transfer_async_t():
-      pool = ThreadPool(processes=self.parallelism)
-      self.transfer_status = pool.map(lambda (x, y): self.sendFile(x, y), self.all_files)
+  def is_transfer_finished(self):
+    for i in self.transfer_pool_results:
+      if not i.ready():
+        return False
 
-    self.transfer_thread = threading.Thread(target=start_transfer_async_t)
-    self.transfer_thread.setDaemon(True)
-    self.transfer_thread.start()
-
-    return self.transfer_thread
-
+    return True
+    
   def is_transfer_success(self):
     return self.transfer_status.count(False) == 0
+      
+  def send_file_with_status(self, file_name, file_dest):
+    self.transfer_status.append(self.send_file(file_name, file_dest))
 
-  def sendFile(self, file_name, file_dest):
+  def send_file(self, file_name, file_dest):
     udt = ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode)
     transfer_manager = self.server_channel.root.get_transfer_manager()
 
