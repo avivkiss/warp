@@ -2,8 +2,10 @@ A todo list in taskpaper format, try taskpaper from the Mac App store  or instal
 
 General:
 	- recursive transfer with exposed stat in separate thread 
-	- progress bar
+	- progress bar, speed indicator. 
 	- option for symlinks
+	- timestamps and permissions
+	- disable first verification, just using file size.  
 
 Archive:
 	- tcp mode testing @done @project(General)
