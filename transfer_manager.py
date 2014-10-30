@@ -36,6 +36,13 @@ class TransferManager:
 
     return os.path.getsize(filepath)
 
+  def total_size(self, files):
+    size = 0
+    for path in files:
+      if os.path.isfile(path):
+        size += os.path.getsize(path)
+    return size
+
   def validate_filepath(self, filepath, client_path):
     """
     Validates the filepath, and returns the correct path

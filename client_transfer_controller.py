@@ -19,6 +19,7 @@ class ClientTransferController:
     self.transfer_pool_results = []
     self.parallelism = parallelism
     self.transfer_status = []
+    self.files = []
     self.follow_links = follow_links
 
   def start(self):
@@ -55,8 +56,10 @@ class ClientTransferController:
     for i in self.transfer_pool_results:
       if not i.ready():
         return False
-
     return True
+
+  def get_server_received_size(self):
+    return self.server_channel.root.get_transfer_manager().total_size(self.files)
 
   def is_transfer_success(self):
     return self.transfer_status.count(False) == 0
@@ -72,6 +75,7 @@ class ClientTransferController:
 
     file_path = transfer_manager.validate_filepath(file_dest, file_name)
     logger.debug("Saving to... " + file_path)
+    self.files.append(file_path)
 
     block_count = 0
 

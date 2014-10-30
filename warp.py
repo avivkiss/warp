@@ -10,6 +10,7 @@ from connection import Connection
 from client_transfer_controller import ClientTransferController
 import plac
 import sys, time
+from clint.textui import progress
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
@@ -35,8 +36,10 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   logger.debug("Starting transfer")
   transfer_thread = controller.start()
 
-  while not controller.is_transfer_finished():
-    time.sleep(0.1)
+  with progress.Bar(label="", expected_size=controller.transfer_size) as bar:
+    while not controller.is_transfer_finished():
+      bar.show(controller.get_server_received_size(), controller.transfer_size)
+      time.sleep(0.1)
 
   if controller.is_transfer_success():
     logger.debug("Done with transfer.")
