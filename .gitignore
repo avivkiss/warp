@@ -66,3 +66,13 @@ test.file
 handshake.py.orig
 
 *.mp4
+
+test/bar/foo12
+
+test/foo1
+
+test/foo12
+
+test/foo123
+
+test/foo

@@ -1,7 +1,8 @@
 
 from common_tools import *
 from client_udt_manager import ClientUDTManager
-import os
+import os, threading
+from multiprocessing.pool import ThreadPool
 
 
 class ClientTransferController:
@@ -14,38 +15,56 @@ class ClientTransferController:
     self.recursive = recursive
     self.verify = not disable_verify
     self.tcp_mode = tcp_mode
+    self.transfer_size = 0
+    self.all_files = []
 
   def start(self):
     if os.path.isdir(self.file_src) and not self.recursive:
-      logger.debug(str(self.file_src) + " is a directory")
-      return False
+      fail(str(self.file_src) + " is a directory")
     if os.path.isfile(self.file_src) and self.recursive:
-      logger.debug(str(self.file_src) + " is a file")
-      return False
+      fail(str(self.file_src) + " is a file")
     if not os.path.isfile(self.file_src) and not os.path.isdir(self.file_src):
-      logger.debug("Source file not found")
-      return False
+      fail("Source file not found")
+
     if not self.recursive:
-      return self.sendFile(self.file_src)
+      self.transfer_size = os.path.getsize(self.file_src)
+      self.all_files = [(self.file_src, self.file_dest)]
     else:
       transfer_manager = self.server_channel.root.get_transfer_manager()
       transfer_manager.create_dir(self.file_dest)
-      for dir, subdirs, files in os.walk(self.file_src):
-        transfer_manager.create_dir(os.path.join(self.file_root_dest, dir))
-        for file in files:
-          self.file_dest = os.path.join(self.file_root_dest, dir, file)
-          logger.debug("sending to: " + str(self.file_dest))
-          if not self.sendFile(os.path.join(dir, file)):
-            return False
-      return True
+      for directory, subdirs, files in os.walk(self.file_src):
+        transfer_manager.create_dir(os.path.join(self.file_root_dest, directory))
+        for f in files:
+          file_dest = os.path.join(self.file_root_dest, directory, f)
+          file_src = os.path.join(directory, f)
+          self.all_files.append((file_src, file_dest))
+          self.transfer_size += os.path.getsize(file_src)
 
-  def sendFile(self, file_name):
+    return self.start_transfer_async()
+
+  def start_transfer_async(self):
+    def start_transfer_async_t():
+      pool = ThreadPool(processes=POOL_SIZE)
+      self.transfer_status = pool.map(lambda (x, y): self.sendFile(x, y), self.all_files)
+
+    self.transfer_thread = threading.Thread(target=start_transfer_async_t)
+    self.transfer_thread.setDaemon(True)
+    self.transfer_thread.start()
+
+    return self.transfer_thread
+
+  def is_transfer_success(self):
+    return reduce(lambda x, y: 0 + y if x is False else 1 + y, self.transfer_status) == 0
+      
+
+
+  def sendFile(self, file_name, file_dest):
     udt = ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode)
     transfer_manager = self.server_channel.root.get_transfer_manager()
 
-    logger.debug("Source " + file_name + " Dest: " + self.file_dest)
+    logger.debug("Source " + file_name + " Dest: " + file_dest)
 
-    file_path = transfer_manager.validate_filepath(self.file_dest, file_name)
+    file_path = transfer_manager.validate_filepath(file_dest, file_name)
     logger.debug("Saving to... " + file_path)
 
     block_count = 0

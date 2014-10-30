@@ -9,7 +9,7 @@ from common_tools import *
 from connection import Connection
 from client_transfer_controller import ClientTransferController
 import plac
-import sys
+import sys, time
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
@@ -31,9 +31,12 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify)
 
   logger.debug("Starting transfer")
-  success = controller.start()
+  transfer_thread = controller.start()
 
-  if success:
+  while transfer_thread.isAlive():
+    time.sleep(0.1)
+
+  if not controller.is_transfer_success():
     logger.debug("Done with transfer.")
   else:
     logger.debug("Failed to send file.")
