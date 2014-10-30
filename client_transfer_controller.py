@@ -55,7 +55,7 @@ class ClientTransferController:
     return self.transfer_thread
 
   def is_transfer_success(self):
-    return reduce(lambda x, y: 0 + y if x is False else 1 + y, self.transfer_status) == 0
+    return self.transfer_status.count(False) == 0
       
 
 
