@@ -23,7 +23,7 @@ class ClientUDTManager:
     self.send_nonce()
 
   def send_file(self, file_src, file_dest, block_count, file_size):
-    self.server_udt_manager.recieve_data(file_dest, block_count, file_size)
+    self.server_udt_manager.receive_data(file_dest, block_count, file_size)
     self.send_data(file_src, block_count)
 
   def connect_to_server(self):

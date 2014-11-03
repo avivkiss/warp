@@ -47,12 +47,12 @@ class ServerUDTManager:
 
     logger.debug("Nonce verified.")
 
-  def recieve_data(self, output_file, block_count, file_size):
+  def receive_data(self, output_file, block_count, file_size):
     """
     Receives data and writes it to disk, stops when it is no longer receiving
     data.
     """
-    def recieve_data_threaded(output_file, block_count, file_size):
+    def receive_data_threaded(output_file, block_count, file_size):
       logger.debug("Receiving data...")
       output_file = open(output_file, "r+")
       output_file.seek(block_count * CHUNK_SIZE)
@@ -80,7 +80,7 @@ class ServerUDTManager:
       logger.debug("Closing file...  " + output_file.name)
       output_file.close()
 
-    thread = threading.Thread(target=recieve_data_threaded, args=(output_file, block_count, file_size))
+    thread = threading.Thread(target=receive_data_threaded, args=(output_file, block_count, file_size))
     thread.start()
 
     return thread
