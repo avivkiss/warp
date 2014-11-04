@@ -26,6 +26,12 @@ class TransferManager:
   def overwrite_file(self, filepath):
     open(filepath, "w").close()
 
+  def get_size(self, filepath):
+    if not os.path.isfile(filepath):
+      return 0
+    else:
+      return os.path.getsize(filepath)
+
   def get_size_and_init_file_path(self, filepath):
     if not os.path.isfile(filepath):
       output_file = open(filepath, "w")

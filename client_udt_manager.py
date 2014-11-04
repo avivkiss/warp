@@ -13,6 +13,7 @@ class ClientUDTManager:
     self.port = None
     self.nonce = None
     self.tcp_mode = tcp_mode
+    self.server_udt_manager = None
 
   def connect(self):
     self.server_udt_manager = self.server_controller.root.get_udt_manager()(self.tcp_mode)
@@ -63,6 +64,12 @@ class ClientUDTManager:
       self.socket.send(bytearray(self.nonce))
     else:
       self.socket.sendall(self.nonce)
+
+  def get_total_recieved(self):
+    if self.server_udt_manager is None:
+      return 0
+
+    return self.server_udt_manager.get_total_recieved()
 
   def send_data(self, file_src, block_count=0):
     """
