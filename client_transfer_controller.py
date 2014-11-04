@@ -65,6 +65,8 @@ class ClientTransferController:
 
     res = pool.map(lambda x: x.get_progress(), self.transfer_agents)
 
+    pool.close()
+
     return reduce(lambda x, y: x + y, res, 0)
 
   def is_transfer_finished(self):

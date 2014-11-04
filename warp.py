@@ -9,19 +9,23 @@ from common_tools import *
 from connection import Connection
 from client_transfer_controller import ClientTransferController
 import plac
-import sys, time
+import sys, time, logging
 from clint.textui import progress
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
     recursive = ('Transfer directory', 'flag', 'r'),
     parallelism = ('parallelism', 'option', 'p', int),
-    disable_verify = ('Disable verify', 'flag', 'v'),
+    disable_verify = ('Disable verify', 'flag', 'w'),
+    verbose = ('Enable logging', 'flag', 'v'),
     follow_links = ('Follow symbolic links', 'flag', 'L'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, follow_links, custom_comm_port=PORT, parallelism=3):
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, follow_links, verbose=False, custom_comm_port=PORT, parallelism=3):
   # Extract the username and hostname from the arguments,
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
+
+  if verbose:
+    logger.setLevel(logging.DEBUG)
 
   # Start an ssh connection used by the xmlrpc connection,
   # the comm_port is used for port forwarding.
