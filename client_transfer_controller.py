@@ -31,24 +31,21 @@ class ClientTransferController:
 
     pool = ThreadPool(processes=self.parallelism)
     if not self.recursive:
-      transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, self.file_src, self.file_dest, self.verify)
+      transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, self.file_src, self.file_dest, self.verify, False)
       self.transfer_agents.append(transfer_agent)
       pool.apply_async(transfer_agent.send_file)
     else:
-      transfer_manager = self.server_channel.root.get_transfer_manager()
-      transfer_manager.create_dir(self.file_dest)
       for directory, subdirs, files in os.walk(self.file_src, followlinks=self.follow_links):
         # Make sure the directory we use on the server starts where we want it to
         # Instead of having the same path the client has
         server_directory = os.path.relpath(directory, self.file_src)
         if(str(server_directory) == "."):
           server_directory = ""
-        transfer_manager.create_dir(os.path.join(self.file_root_dest, server_directory))
         for f in files:
           file_dest = os.path.join(self.file_root_dest, server_directory, f)
           file_src = os.path.join(directory, f)
 
-          transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, file_src, file_dest, self.verify)
+          transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, file_src, file_dest, self.verify, True)
 
           self.transfer_agents.append(transfer_agent)
 

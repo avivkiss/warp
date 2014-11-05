@@ -49,7 +49,7 @@ class TransferManager:
         size += os.path.getsize(path)
     return size
 
-  def validate_filepath(self, filepath, client_path):
+  def validate_filepath(self, filepath, client_path, create_dirs):
     """
     Validates the filepath, and returns the correct path
     """
@@ -64,6 +64,12 @@ class TransferManager:
           return (True, os.path.join(head, client_tail))
 
     elif head != "" and not os.path.exists(head):
+      if create_dirs:
+        try:
+          self.create_dir(head)
+        except OSError:
+          pass
+        return (True, filepath)
       result = filepath + ": No such file or directory"
       logger.exception(result)
       return (False, result)

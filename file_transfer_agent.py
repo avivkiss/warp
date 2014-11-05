@@ -1,10 +1,9 @@
 from config import *
 from common_tools import *
-from client_udt_manager import ClientUDTManager
 import os
 
 class FileTransferAgent:
-  def __init__(self, udt, server_channel, file_name, file_dest, verify):
+  def __init__(self, udt, server_channel, file_name, file_dest, verify, createDirs):
     self.file_dest = file_dest
     self.file_name = file_name
     self.verify = verify
@@ -14,6 +13,7 @@ class FileTransferAgent:
     self.udt = udt
     self.server_channel = server_channel
     self.transfer_manager = self.server_channel.root.get_transfer_manager()
+    self.createDirs = createDirs
 
   def get_progress(self):
     if self.is_transfering is False and self.transfer_finished is False:
@@ -34,7 +34,7 @@ class FileTransferAgent:
 
   def get_server_file_path(self):
     if not hasattr(self, "_server_file_path"):
-      result = self.transfer_manager.validate_filepath(self.file_dest, self.file_name)
+      result = self.transfer_manager.validate_filepath(self.file_dest, self.file_name, self.createDirs)
       self.validate_success = result[0]
       self._server_file_path = result[1]
 
