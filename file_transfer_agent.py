@@ -18,9 +18,14 @@ class FileTransferAgent:
     self.createDirs = createDirs
 
   def get_progress(self):
+    # We need to check if it is verifying first because when is_verifying is true
+    # is_transfering and transfer_finished are False and we don't
+    # want to return the base size
+    if self.is_verifying:
+      return self.file_size
     if self.is_transfering is False and self.transfer_finished is False:
       return self.base_server_file_size
-    elif self.is_verifying or (self.is_transfering is False and self.transfer_finished is True):
+    elif self.is_transfering is False and self.transfer_finished is True:
       return self.file_size
     elif self.is_transfering is True and self.transfer_finished is False:
       return self.transfer_manager.get_size(self.server_file_path)
