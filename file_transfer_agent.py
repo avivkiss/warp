@@ -30,7 +30,9 @@ class FileTransferAgent:
   base_server_file_size = property(get_server_file_size)
 
   def get_server_file_path(self):
-    return self.transfer_manager.validate_filepath(self.file_dest, self.file_name)
+    result = self.transfer_manager.validate_filepath(self.file_dest, self.file_name)
+    self.validate_success = result[0]
+    return result[1]
   server_file_path = property(get_server_file_path)
 
   def get_total_size(self):
@@ -43,6 +45,11 @@ class FileTransferAgent:
     logger.debug("Source " + self.file_name + " Dest: " + self.file_dest)
 
     logger.debug("Saving to... " + self.server_file_path)
+
+    if(not self.validate_success):
+      self.transfer_finished = True
+      self.transfer_success = False
+      return
 
     block_count = 0
 

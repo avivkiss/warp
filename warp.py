@@ -48,7 +48,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   if controller.is_transfer_success():
     logger.debug("Done with transfer.")
   else:
-    logger.debug("Failed to send file.")
+    logger.warn("Failed to send file.")
 
   controller.close()
   connection.close()

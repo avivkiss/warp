@@ -56,17 +56,20 @@ class TransferManager:
     (head, tail) = os.path.split(filepath)
     if not tail:
       if not os.path.exists(head):
-        # TODO add error support for warp.py
-        fail("Directory " + head + " does not exist.")
+        result = "Directory " + head + " does not exist."
+        logger.exception(result)
+        return (False, result)
       else:
           (client_head, client_tail) = os.path.split(client_path)
-          return os.path.join(head, client_tail)
+          return (True, os.path.join(head, client_tail))
 
     elif head != "" and not os.path.exists(head):
-      fail(filepath + ": No such file or directory")
+      result = filepath + ": No such file or directory"
+      logger.exception(result)
+      return (False, result)
 
     elif not head and os.path.isdir(tail):
       (client_head, client_tail) = os.path.split(client_path)
-      return os.path.join(tail, client_tail)
+      return (True, os.path.join(tail, client_tail))
 
-    return filepath
+    return (True, filepath)
