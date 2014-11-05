@@ -16,7 +16,6 @@ class ClientTransferController:
     self.recursive = recursive
     self.verify = not disable_verify
     self.tcp_mode = tcp_mode
-    self.transfer_size = 0
     self.parallelism = parallelism
     self.follow_links = follow_links
     self.transfer_agents = []
@@ -32,8 +31,6 @@ class ClientTransferController:
 
     pool = ThreadPool(processes=self.parallelism)
     if not self.recursive:
-      self.transfer_size = os.path.getsize(self.file_src)
-
       transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, self.file_src, self.file_dest, self.verify)
       self.transfer_agents.append(transfer_agent)
       pool.apply_async(transfer_agent.send_file)
@@ -50,7 +47,6 @@ class ClientTransferController:
         for f in files:
           file_dest = os.path.join(self.file_root_dest, server_directory, f)
           file_src = os.path.join(directory, f)
-          self.transfer_size += os.path.getsize(file_src)
 
           transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, file_src, file_dest, self.verify)
 
@@ -68,6 +64,17 @@ class ClientTransferController:
     pool.close()
 
     return reduce(lambda x, y: x + y, res, 0)
+
+  def get_total_transfer_size(self):
+    pool = ThreadPool(processes=20)
+
+    res = pool.map(lambda x: x.file_size, self.transfer_agents)
+
+    pool.close()
+
+    return reduce(lambda x, y: x + y, res, 0)
+  transfer_size = property(get_total_transfer_size)
+
 
   def is_transfer_finished(self):
     for i in self.transfer_agents:
