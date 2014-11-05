@@ -38,17 +38,17 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links)
 
   logger.debug("Starting transfer")
-  transfer_thread = controller.start()
+  result = controller.start()
+  if(result[0]):
+    with progress.Bar(label="", expected_size=controller.transfer_size) as bar:
+      while not controller.is_transfer_finished():
+        bar.show(controller.get_server_received_size(), controller.transfer_size)
+        time.sleep(0.1)
 
-  with progress.Bar(label="", expected_size=controller.transfer_size) as bar:
-    while not controller.is_transfer_finished():
-      bar.show(controller.get_server_received_size(), controller.transfer_size)
-      time.sleep(0.1)
-
-  if controller.is_transfer_success():
-    logger.debug("Done with transfer.")
-  else:
-    logger.warn("Failed to send file.")
+    if controller.is_transfer_success():
+      logger.debug("Done with transfer.")
+    else:
+      logger.warn("Failed to send file.")
 
   controller.close()
   connection.close()

@@ -20,7 +20,6 @@ class ClientTransferController:
     self.follow_links = follow_links
     self.transfer_agents = []
 
-
   def start(self):
     if os.path.isdir(self.file_src) and not self.recursive:
       fail(str(self.file_src) + " is a directory")
@@ -31,7 +30,11 @@ class ClientTransferController:
 
     pool = ThreadPool(processes=self.parallelism)
     if not self.recursive:
-      transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, self.file_src, self.file_dest, self.verify, False)
+      try:
+        transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, self.file_src, self.file_dest, self.verify, False)
+      except EOFError:
+        logger.error("Could not connect")
+        return (False, None)
       self.transfer_agents.append(transfer_agent)
       pool.apply_async(transfer_agent.send_file)
     else:
@@ -44,14 +47,17 @@ class ClientTransferController:
         for f in files:
           file_dest = os.path.join(self.file_root_dest, server_directory, f)
           file_src = os.path.join(directory, f)
-
-          transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, file_src, file_dest, self.verify, True)
+          try:
+            transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, file_src, file_dest, self.verify, True)
+          except EOFError:
+            logger.error("Could not connect")
+            return (False, None)
 
           self.transfer_agents.append(transfer_agent)
 
           pool.apply_async(transfer_agent.send_file)
 
-    return pool
+    return (True, pool)
 
   def get_server_received_size(self):
     pool = ThreadPool(processes=20)
