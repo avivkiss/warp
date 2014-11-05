@@ -78,7 +78,6 @@ class ClientTransferController:
     return reduce(lambda x, y: x + y, res, 0)
   transfer_size = property(get_total_transfer_size)
 
-
   def is_transfer_finished(self):
     for i in self.transfer_agents:
       if not i.transfer_finished:
@@ -93,4 +92,3 @@ class ClientTransferController:
     Cleanup goes here, we probably have to close some connections...
     """
     pass
-

@@ -26,20 +26,12 @@ forwarding (the openssh -L option) from a local port through a tunneled
 connection to a destination reachable from the SSH server machine.
 """
 
-import getpass
-import os
-import socket
 from config import *
 import select
 try:
     import SocketServer
 except ImportError:
     import socketserver as SocketServer
-
-import sys
-from optparse import OptionParser
-
-import paramiko
 
 SSH_PORT = 22
 DEFAULT_PORT = 4000
@@ -50,7 +42,7 @@ g_verbose = True
 class ForwardServer (SocketServer.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
-    
+
 
 class Handler (SocketServer.BaseRequestHandler):
 
@@ -77,7 +69,10 @@ class Handler (SocketServer.BaseRequestHandler):
                 data = self.request.recv(1024)
                 if len(data) == 0:
                     break
-                chan.send(data)
+                try:
+                  chan.send(data)
+                except EOFError:
+                    logger.debug("Chanel closed")
             if chan in r:
                 data = chan.recv(1024)
                 if len(data) == 0:

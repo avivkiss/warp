@@ -2,6 +2,7 @@ from config import *
 from common_tools import *
 import os
 
+
 class FileTransferAgent:
   def __init__(self, udt, server_channel, file_name, file_dest, verify, createDirs):
     self.file_dest = file_dest
@@ -10,19 +11,21 @@ class FileTransferAgent:
     self.is_transfering = False
     self.transfer_finished = False
     self.transfer_success = False
+    self.is_verifying = False
     self.udt = udt
     self.server_channel = server_channel
     self.transfer_manager = self.server_channel.root.get_transfer_manager()
     self.createDirs = createDirs
 
   def get_progress(self):
+    if self.is_verifying:
+      return self.file_size
     if self.is_transfering is False and self.transfer_finished is False:
       return self.base_server_file_size
     elif self.is_transfering is False and self.transfer_finished is True:
       return self.file_size
     elif self.is_transfering is True and self.transfer_finished is False:
       return self.transfer_manager.get_size(self.server_file_path)
-
     return 0
 
   def get_server_file_size(self):
@@ -88,16 +91,16 @@ class FileTransferAgent:
     self.is_transfering = False
 
     if self.verify:
+      self.is_verifying = True
       if self.verify_partial_hash(self.file_name, self.transfer_manager.get_file_hash(self.server_file_path)):
         self.transfer_success = True
-        self.transfer_finished = True
       else:
         logger.debug("File failed validation check.")
         self.transfer_success = False
-        self.transfer_finished = True
+      self.is_verifying = False
     else:
       self.transfer_success = True
-      self.transfer_finished = True
+    self.transfer_finished = True
 
   def file_block_count(self, file_src):
     return (os.path.getsize(file_src) / CHUNK_SIZE)
