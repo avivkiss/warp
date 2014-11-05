@@ -56,6 +56,7 @@ class FileTransferAgent:
     logger.debug("Saving to... " + self.server_file_path)
 
     if(not self.validate_success):
+      self.is_transfering = False
       self.transfer_finished = True
       self.transfer_success = False
       return
@@ -75,6 +76,7 @@ class FileTransferAgent:
         logger.debug("File already transfered")
         self.transfer_finished = True
         self.transfer_success = True
+        self.is_transfering = False
         return
     else:
       # This will create the file on the server side
