@@ -15,9 +15,9 @@ class FileTransferAgent:
     self.server_channel = server_channel
     self.transfer_manager = self.server_channel.root.get_transfer_manager()
 
-    self.file_size_m = None
-    self.base_server_file_size_m = None
-    self.server_file_path_m = None
+    self._file_size = None
+    self._base_server_file_size = None
+    self._server_file_path = None
 
   def get_progress(self):
     if self.is_transfering is False and self.transfer_finished is False:
@@ -30,26 +30,26 @@ class FileTransferAgent:
     return 0
 
   def get_server_file_size(self):
-    if self.base_server_file_size_m is None:
-      self.base_server_file_size_m = self.transfer_manager.get_size_and_init_file_path(self.server_file_path)
+    if self._base_server_file_size is None:
+      self._base_server_file_size = self.transfer_manager.get_size_and_init_file_path(self.server_file_path)
 
-    return self.base_server_file_size_m
+    return self._base_server_file_size
   base_server_file_size = property(get_server_file_size)
 
   def get_server_file_path(self):
-    if self.server_file_path_m is None:
+    if self._server_file_path is None:
       result = self.transfer_manager.validate_filepath(self.file_dest, self.file_name)
       self.validate_success = result[0]
-      self.server_file_path_m = result[1]
+      self._server_file_path = result[1]
 
-    return self.server_file_path_m
+    return self._server_file_path
   server_file_path = property(get_server_file_path)
 
   def get_total_size(self):
-    if self.file_size_m is None:
-      self.file_size_m = os.path.getsize(self.file_name)
+    if self._file_size is None:
+      self._file_size = os.path.getsize(self.file_name)
 
-    return self.file_size_m
+    return self._file_size
   file_size = property(get_total_size)
 
   def send_file(self):
