@@ -2,16 +2,16 @@
 from server_udt_manager import ServerUDTManager
 from transfer_manager import TransferManager
 import rpyc
-
+from config import *
 
 class ServerTransferController(rpyc.Service):
   def on_connect(self):
-    print "on connect"
+    logger.info("on connect")
     self.transfer_manager = TransferManager()
     self.server_udt_manager = ServerUDTManager
 
   def on_disconnect(self):
-    print "on disconnect"
+    logger.info("on disconnect")
 
   def exposed_get_transfer_manager(self):
     return self.transfer_manager

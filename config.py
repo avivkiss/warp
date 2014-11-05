@@ -5,7 +5,14 @@
 # some logging setup
 import logging
 
+import __main__ as main
+
 LOG_LEVEL = logging.WARN
+
+if main.__file__ == "server.py":
+  LOG_LEVEL = logging.DEBUG
+
+
 logging.basicConfig(format='%(levelname)s: %(message)s', level=LOG_LEVEL)
 
 # Just a random chunk size to send the file in pieces,
@@ -31,3 +38,4 @@ def get_file_logger(logger_name, filepath="/var/tmp/warp.log"):
   return l
 
 logger = get_file_logger('warp')
+
