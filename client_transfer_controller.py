@@ -69,13 +69,14 @@ class ClientTransferController:
     return reduce(lambda x, y: x + y, res, 0)
 
   def get_total_transfer_size(self):
-    pool = ThreadPool(processes=20)
+    if not hasattr(self, "_get_total_transfer_size"):
+      pool = ThreadPool(processes=20)
 
-    res = pool.map(lambda x: x.file_size, self.transfer_agents)
+      res = pool.map(lambda x: x.file_size, self.transfer_agents)
 
-    pool.close()
-
-    return reduce(lambda x, y: x + y, res, 0)
+      pool.close()
+      self._get_total_transfer_size = reduce(lambda x, y: x + y, res, 0)
+    return self._get_total_transfer_size
   transfer_size = property(get_total_transfer_size)
 
   def is_transfer_finished(self):
