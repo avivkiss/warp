@@ -15,10 +15,6 @@ class FileTransferAgent:
     self.server_channel = server_channel
     self.transfer_manager = self.server_channel.root.get_transfer_manager()
 
-    self._file_size = None
-    self._base_server_file_size = None
-    self._server_file_path = None
-
   def get_progress(self):
     if self.is_transfering is False and self.transfer_finished is False:
       return self.base_server_file_size
@@ -30,14 +26,14 @@ class FileTransferAgent:
     return 0
 
   def get_server_file_size(self):
-    if self._base_server_file_size is None:
+    if not hasattr(self, "_base_server_file_size"):
       self._base_server_file_size = self.transfer_manager.get_size_and_init_file_path(self.server_file_path)
 
     return self._base_server_file_size
   base_server_file_size = property(get_server_file_size)
 
   def get_server_file_path(self):
-    if self._server_file_path is None:
+    if not hasattr(self, "_server_file_path"):
       result = self.transfer_manager.validate_filepath(self.file_dest, self.file_name)
       self.validate_success = result[0]
       self._server_file_path = result[1]
@@ -46,7 +42,7 @@ class FileTransferAgent:
   server_file_path = property(get_server_file_path)
 
   def get_total_size(self):
-    if self._file_size is None:
+    if not hasattr(self, "_file_size)":
       self._file_size = os.path.getsize(self.file_name)
 
     return self._file_size
