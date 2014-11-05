@@ -68,16 +68,18 @@ class FileTransferAgent:
     self.udt.send_file(self.file_name, self.server_file_path, block_count, self.file_size)
 
     self.is_transfering = False
-    self.transfer_finished = True
 
     if self.verify:
       if self.verify_partial_hash(self.file_name, self.transfer_manager.get_file_hash(self.server_file_path)):
         self.transfer_success = True
+        self.transfer_finished = True
       else:
         logger.debug("File failed validation check.")
         self.transfer_success = False
+        self.transfer_finished = True
     else:
       self.transfer_success = True
+      self.transfer_finished = True
 
   def file_block_count(self, file_src):
     return (os.path.getsize(file_src) / CHUNK_SIZE)
