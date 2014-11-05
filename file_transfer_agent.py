@@ -42,7 +42,7 @@ class FileTransferAgent:
   server_file_path = property(get_server_file_path)
 
   def get_total_size(self):
-    if not hasattr(self, "_file_size)":
+    if not hasattr(self, "_file_size"):
       self._file_size = os.path.getsize(self.file_name)
 
     return self._file_size
