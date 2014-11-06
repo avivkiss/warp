@@ -1,5 +1,6 @@
 from config import *
 from common_tools import *
+import threading
 import os
 
 
@@ -18,6 +19,14 @@ class FileTransferAgent:
     self.createDirs = createDirs
     self.block_count = 0
 
+  def synchronized(func):
+    func.__lock__ = threading.Lock()
+
+    def synced_func(*args, **kws):
+        with func.__lock__:
+            return func(*args, **kws)
+    return synced_func
+
   def get_progress(self):
     if self.is_verifying or (self.is_transfering is False and self.transfer_finished is True):
       return self.file_size
@@ -27,6 +36,7 @@ class FileTransferAgent:
       return self.transfer_manager.get_size(self.server_file_path)
     return 0
 
+  @synchronized
   def get_server_file_size(self):
     if not hasattr(self, "_base_server_file_size"):
       self._base_server_file_size = self.transfer_manager.get_size_and_init_file_path(self.server_file_path)
@@ -34,6 +44,7 @@ class FileTransferAgent:
     return self._base_server_file_size
   base_server_file_size = property(get_server_file_size)
 
+  @synchronized
   def get_server_validated_size(self):
     if not hasattr(self, "_base_server_validated_size"):
       if(self.base_server_file_size > 0):
@@ -59,6 +70,7 @@ class FileTransferAgent:
     return self._base_server_validated_size
   base_server_validated_size = property(get_server_validated_size)
 
+  @synchronized
   def get_server_file_path(self):
     if not hasattr(self, "_server_file_path"):
       result = self.transfer_manager.validate_filepath(self.file_dest, self.file_name, self.createDirs)
@@ -68,6 +80,7 @@ class FileTransferAgent:
     return self._server_file_path
   server_file_path = property(get_server_file_path)
 
+  @synchronized
   def get_total_size(self):
     if not hasattr(self, "_file_size"):
       self._file_size = os.path.getsize(self.file_name)
