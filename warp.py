@@ -42,7 +42,10 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   if(result[0]):
     with progress.Bar(label="", expected_size=controller.transfer_size) as bar:
       while not controller.is_transfer_finished():
-        bar.show(controller.get_server_received_size(), controller.transfer_size)
+        received = controller.get_server_received_size()
+        bar.show(received, controller.transfer_size)
+        if(received == controller.transfer_size) and controller.is_transfer_validating():
+          bar.filled_char = 'V'
         time.sleep(0.1)
 
     if controller.is_transfer_success():

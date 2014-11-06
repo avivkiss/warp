@@ -68,6 +68,15 @@ class ClientTransferController:
 
     return reduce(lambda x, y: x + y, res, 0)
 
+  def is_transfer_validating(self):
+    pool = ThreadPool(processes=20)
+
+    res = pool.map(lambda x: (x.transfer_finished, x.is_verifying), self.transfer_agents)
+
+    pool.close()
+    status = reduce(lambda x, y: x if y[0] is True else (x[0] or y[1], x[1] and y[1]), res, (False, True))
+    return status[0] and status[1]
+
   def get_total_transfer_size(self):
     if not hasattr(self, "_get_total_transfer_size"):
       pool = ThreadPool(processes=20)
