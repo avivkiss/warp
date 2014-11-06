@@ -2,10 +2,10 @@ A todo list in taskpaper format, try taskpaper from the Mac App store  or instal
 
 General:
 	- progress bar, speed indicator. 
-	- option for symlinks
 	- timestamps and permissions
-	- disable first verification, just using file size.  
-	- option to control parallelism 
+	- disable first verification, just using file size.
+	- choose local address 
+	- how many files sent
 
 Archive:
 	- tcp mode testing @done @project(General)
