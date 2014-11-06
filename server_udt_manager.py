@@ -16,7 +16,7 @@ class ServerUDTManager:
     self.sock = self.get_socket()
     self.port = self.sock.getsockname()[1]
     self.nonce = self.generate_nonce()
-    self.total_recieved = 0
+    self.size = 0
 
   def open_connection(self):
     if not self.tcp_mode:
@@ -30,7 +30,7 @@ class ServerUDTManager:
     return (self.port, self.nonce)
 
   def get_total_recieved(self):
-    return self.total_recieved
+    return self.size
 
   def accept_and_verify(self):
     if not self.tcp_mode:
@@ -61,7 +61,7 @@ class ServerUDTManager:
       output_file = open(output_file, "r+")
       output_file.seek(block_count * CHUNK_SIZE)
 
-      size = block_count * CHUNK_SIZE
+      self.size = block_count * CHUNK_SIZE
       data = bytearray(CHUNK_SIZE)
 
       if not self.tcp_mode:
@@ -69,17 +69,15 @@ class ServerUDTManager:
           len_rec = self.conn.recv(data)
           data = str(data)
           output_file.write(data[:len_rec])
-          size = size + len_rec
-          self.total_recieved +=len_rec
+          self.size += len_rec
 
-          if len_rec == 0 or str(size) == str(file_size):
+          if len_rec == 0 or str(self.size) == str(file_size):
             break
       else:
         while 1:
           data = self.conn.recv(CHUNK_SIZE)
           output_file.write(data)
-          size = size + len(data)
-          self.total_recieved += len(data)
+          self.size += len(data)
           if len(data) == 0:
             break
 

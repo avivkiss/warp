@@ -33,7 +33,7 @@ class FileTransferAgent:
     elif self.is_transfering is False and self.transfer_finished is False:
       return self.base_server_validated_size
     elif self.is_transfering is True and self.transfer_finished is False:
-      return self.transfer_manager.get_size(self.server_file_path)
+      return self.udt.get_total_recieved()
     return 0
 
   @synchronized
