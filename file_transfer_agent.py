@@ -16,12 +16,13 @@ class FileTransferAgent:
     self.server_channel = server_channel
     self.transfer_manager = self.server_channel.root.get_transfer_manager()
     self.createDirs = createDirs
+    self.block_count = 0
 
   def get_progress(self):
     if self.is_verifying or (self.is_transfering is False and self.transfer_finished is True):
       return self.file_size
     elif self.is_transfering is False and self.transfer_finished is False:
-      return self.base_server_file_size
+      return self.base_server_validated_size
     elif self.is_transfering is True and self.transfer_finished is False:
       return self.transfer_manager.get_size(self.server_file_path)
     return 0
@@ -32,6 +33,31 @@ class FileTransferAgent:
 
     return self._base_server_file_size
   base_server_file_size = property(get_server_file_size)
+
+  def get_server_validated_size(self):
+    if not hasattr(self, "_base_server_validated_size"):
+      if(self.base_server_file_size > 0):
+        self.block_count = 0
+        if(self.base_server_file_size != self.file_size):
+          self.block_count = self.transfer_manager.get_blocks(self.server_file_path)
+        file_hash = self.transfer_manager.get_file_hash(self.server_file_path, self.block_count)
+        if not self.verify_partial_hash(self.file_name, file_hash, self.block_count):
+          logger.debug("Client and server side partial hash differ.")
+          self.transfer_manager.overwrite_file(self.server_file_path)
+          self.block_count = 0
+        elif self.block_count == 0:
+          logger.debug("File already transfered")
+          self.transfer_finished = True
+          self.transfer_success = True
+          self.is_transfering = False
+          return
+      else:
+        # This will create the file on the server side
+        self.transfer_manager.overwrite_file(self.server_file_path)
+    self._base_server_validated_size = self.block_count * CHUNK_SIZE
+
+    return self._base_server_validated_size
+  base_server_validated_size = property(get_server_validated_size)
 
   def get_server_file_path(self):
     if not hasattr(self, "_server_file_path"):
@@ -50,7 +76,6 @@ class FileTransferAgent:
   file_size = property(get_total_size)
 
   def send_file(self):
-    self.is_transfering = True
 
     logger.debug("Source " + self.file_name + " Dest: " + self.file_dest)
 
@@ -62,29 +87,12 @@ class FileTransferAgent:
       self.transfer_success = False
       return
 
-    block_count = 0
-
-    if(self.base_server_file_size > 0):
-      block_count = 0
-      if(self.base_server_file_size != self.file_size):
-        block_count = self.transfer_manager.get_blocks(self.server_file_path)
-      file_hash = self.transfer_manager.get_file_hash(self.server_file_path, block_count)
-      if not self.verify_partial_hash(self.file_name, file_hash, block_count):
-        logger.debug("Client and server side partial hash differ.")
-        self.transfer_manager.overwrite_file(self.server_file_path)
-        block_count = 0
-      elif block_count == 0:
-        logger.debug("File already transfered")
-        self.transfer_finished = True
-        self.transfer_success = True
-        self.is_transfering = False
-        return
-    else:
-      # This will create the file on the server side
-      self.transfer_manager.overwrite_file(self.server_file_path)
+    # This will compute the block count
+    self.base_server_validated_size
+    self.is_transfering = True
 
     self.udt.connect()
-    self.udt.send_file(self.file_name, self.server_file_path, block_count, self.file_size)
+    self.udt.send_file(self.file_name, self.server_file_path, self.block_count, self.file_size)
 
     self.is_transfering = False
 
