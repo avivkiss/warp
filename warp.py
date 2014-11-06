@@ -18,14 +18,17 @@ from clint.textui import progress
     parallelism = ('parallelism', 'option', 'p', int),
     disable_verify = ('Disable verify', 'flag', 'w'),
     verbose = ('Enable logging', 'flag', 'v'),
+    timer = ('Time transfer', 'flag', 'T'),
     follow_links = ('Follow symbolic links', 'flag', 'L'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, follow_links, verbose=False, custom_comm_port=PORT, parallelism=3):
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, timer, follow_links, verbose=False, custom_comm_port=PORT, parallelism=3):
   # Extract the username and hostname from the arguments,
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
 
   if verbose:
     logger.setLevel(logging.DEBUG)
+
+  startTime = time.time()
 
   # Start an ssh connection used by the xmlrpc connection,
   # the comm_port is used for port forwarding.
@@ -57,6 +60,9 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   connection.close()
   channel.close()
   logger.debug("Closed connections.")
+
+  if timer:
+    logger.info("Total time: " + str(time.time() - startTime))
 
   sys.exit()
 

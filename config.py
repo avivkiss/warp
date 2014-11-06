@@ -7,7 +7,7 @@ import logging
 
 import __main__ as main
 
-LOG_LEVEL = logging.WARN
+LOG_LEVEL = logging.INFO
 
 if main.__file__ == "server.py" or main.__file__ == "./server.py":
   LOG_LEVEL = logging.DEBUG
@@ -17,7 +17,6 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=LOG_LEVEL)
 # Just a random chunk size to send the file in pieces,
 # should be the same as the chunk size used to write
 CHUNK_SIZE = 4096
-TRANSACTION_HISTORY_FILENAME = "transaction_history.warp"
 NONCE_SIZE = 32
 PORT = 29977
 
@@ -37,4 +36,3 @@ def get_file_logger(logger_name, filepath="/var/tmp/warp.log"):
   return l
 
 logger = get_file_logger('warp')
-

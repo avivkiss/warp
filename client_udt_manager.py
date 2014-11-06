@@ -33,7 +33,7 @@ class ClientUDTManager:
     """
 
     if self.tcp_mode:
-      logger.info("TCP mode")
+      logger.debug("TCP mode")
       sock_type = socket.SOCK_STREAM
 
       for res in socket.getaddrinfo(self.hostname, self.port, socket.AF_UNSPEC, sock_type):
@@ -86,7 +86,7 @@ class ClientUDTManager:
       else:
         self.socket.sendall(data)
       data = f.read(CHUNK_SIZE)
-    logger.info("Data sent.")
+    logger.debug("Data sent.")
     self.socket.close()
     f.close()
 
