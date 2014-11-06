@@ -55,8 +55,7 @@ class FileTransferAgent:
       else:
         # This will create the file on the server side
         self.transfer_manager.overwrite_file(self.server_file_path)
-    self._base_server_validated_size = self.block_count * CHUNK_SIZE
-
+      self._base_server_validated_size = self.block_count * CHUNK_SIZE
     return self._base_server_validated_size
   base_server_validated_size = property(get_server_validated_size)
 
@@ -89,7 +88,7 @@ class FileTransferAgent:
       return
 
     # This will compute the block count
-    if (self.base_server_validated_size == self.base_server_file_size):
+    if (self.base_server_validated_size == self.file_size):
       return
     self.is_transfering = True
 
