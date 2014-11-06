@@ -50,7 +50,8 @@ class FileTransferAgent:
           self.transfer_finished = True
           self.transfer_success = True
           self.is_transfering = False
-          return
+          self._base_server_validated_size = self.base_server_file_size
+          return self._base_server_validated_size
       else:
         # This will create the file on the server side
         self.transfer_manager.overwrite_file(self.server_file_path)
@@ -88,7 +89,8 @@ class FileTransferAgent:
       return
 
     # This will compute the block count
-    self.base_server_validated_size
+    if (self.base_server_validated_size == self.base_server_file_size):
+      return
     self.is_transfering = True
 
     self.udt.connect()
