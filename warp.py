@@ -68,4 +68,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
 
 
 if __name__ == '__main__':
-  plac.call(main)
+  try:
+    plac.call(main)
+  except KeyboardInterrupt:
+    logger.warn("Transfer canceled")
