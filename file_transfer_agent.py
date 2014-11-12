@@ -103,9 +103,9 @@ class FileTransferAgent:
     # This will compute the block count
     if (self.base_server_validated_size == self.file_size):
       return
-    self.is_transfering = True
 
     self.udt.connect()
+    self.is_transfering = True
     self.udt.send_file(self.file_name, self.server_file_path, self.block_count, self.file_size)
 
     self.is_transfering = False
