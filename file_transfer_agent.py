@@ -5,7 +5,7 @@ import os
 
 
 class FileTransferAgent:
-  def __init__(self, udt, server_channel, file_name, file_dest, verify, createDirs):
+  def __init__(self, udt, transfer_manager, file_name, file_dest, verify, createDirs):
     self.file_dest = file_dest
     self.file_name = file_name
     self.verify = verify
@@ -14,8 +14,7 @@ class FileTransferAgent:
     self.transfer_success = False
     self.is_verifying = False
     self.udt = udt
-    self.server_channel = server_channel
-    self.transfer_manager = self.server_channel.root.get_transfer_manager()
+    self.transfer_manager = transfer_manager
     self.createDirs = createDirs
     self.block_count = 0
 

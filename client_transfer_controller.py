@@ -29,9 +29,10 @@ class ClientTransferController:
       fail("Source file not found")
 
     pool = ThreadPool(processes=self.parallelism)
+    transfer_manager = self.server_channel.root.get_transfer_manager()
     if not self.recursive:
       try:
-        transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, self.file_src, self.file_dest, self.verify, False)
+        transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, self.file_src, self.file_dest, self.verify, False)
       except EOFError:
         logger.error("Could not connect")
         return (False, None)
@@ -48,7 +49,7 @@ class ClientTransferController:
           file_dest = os.path.join(self.file_root_dest, server_directory, f)
           file_src = os.path.join(directory, f)
           try:
-            transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), self.server_channel, file_src, file_dest, self.verify, True)
+            transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, file_src, file_dest, self.verify, True)
           except EOFError:
             logger.error("Could not connect")
             return (False, None)
@@ -56,7 +57,6 @@ class ClientTransferController:
           self.transfer_agents.append(transfer_agent)
 
           pool.apply_async(transfer_agent.send_file)
-
     return (True, pool)
 
   def get_server_received_size(self):
