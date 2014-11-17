@@ -53,20 +53,15 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
 
   gui.files_processed_indicator.set_update(lambda : controller.files_processed)
   gui.files_sent_indicator.set_update(lambda : controller.get_files_transfered())
-  
+
   start_thread.join()
-  gui.progress_bar.set_update(lambda : (controller.transfer_size, controller.get_server_received_size()
-))
+  gui.progress_bar.set_update(lambda : (controller.transfer_size, controller.get_server_received_size(), controller.is_transfer_validating() ))
 
 
   if controller.start_success:
     gui.log_message("Start success.")
       
     while not controller.is_transfer_finished():
-      # gui.log_message("Status retrieved.")
-      # if(received == controller.transfer_size) and controller.is_transfer_validating():
-        # bar.fill_char = 'V'
-
       gui.redraw()
       time.sleep(0.1)
 
@@ -84,6 +79,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   if timer:
     logger.info("Total time: " + str(time.time() - startTime))
 
+  gui.exit()
   sys.exit()
 
 

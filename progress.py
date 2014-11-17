@@ -74,7 +74,7 @@ class Screen(object):
       self.next_line_bottom += 1
 
   def exit(self):
-    print self.screen.clear()
+    print self.term.clear()
     print self.term.exit_fullscreen()
 
 
@@ -136,11 +136,14 @@ class ProgressComponent(Component):
     self.term = Terminal()
     self.label = label
 
-    self.value = (expected_size, progress)
+    self.value = (expected_size, progress, False)
 
   def __str__(self):
     self.progress = self.value[1]
     self.expected_size = self.value[0]
+
+    if self.value[2] and self.progress == self.expected_size:
+      self.fill_char = "V"
 
     width = self.term.width - len(self.label) - 4
     p = self.progress * width // self.expected_size
