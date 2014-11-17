@@ -43,6 +43,7 @@ class ClientTransferController:
     if not self.recursive:
       try:
         transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, self.file_src, self.file_dest, self.verify, False)
+        self.files_processed += 1
       except EOFError:
         logger.error("Could not connect")
         self.start_success = False
