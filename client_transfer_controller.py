@@ -1,7 +1,7 @@
 
 from common_tools import *
 from client_udt_manager import ClientUDTManager
-import os
+import os, threading
 from multiprocessing.pool import ThreadPool
 from file_transfer_agent import FileTransferAgent
 
@@ -19,8 +19,18 @@ class ClientTransferController:
     self.parallelism = parallelism
     self.follow_links = follow_links
     self.transfer_agents = []
+    self.start_success = None
+
+    self.files_processed = 0
 
   def start(self):
+    start_thread = threading.Thread(target=self._start)
+    start_thread.setDaemon(True)
+    start_thread.start()
+
+    return start_thread
+
+  def _start(self):
     if os.path.isdir(self.file_src) and not self.recursive:
       fail(str(self.file_src) + " is a directory")
     if os.path.isfile(self.file_src) and self.recursive:
@@ -35,7 +45,8 @@ class ClientTransferController:
         transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, self.file_src, self.file_dest, self.verify, False)
       except EOFError:
         logger.error("Could not connect")
-        return (False, None)
+        self.start_success = False
+        return
       self.transfer_agents.append(transfer_agent)
       pool.apply_async(transfer_agent.send_file)
     else:
@@ -52,12 +63,15 @@ class ClientTransferController:
             transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, file_src, file_dest, self.verify, True)
           except EOFError:
             logger.error("Could not connect")
-            return (False, None)
+            self.start_success = False
+            return 
 
+          self.files_processed += 1
           self.transfer_agents.append(transfer_agent)
 
           pool.apply_async(transfer_agent.send_file)
-    return (True, pool)
+    
+    self.start_success = True
 
   def get_server_received_size(self):
     pool = ThreadPool(processes=20)
@@ -93,6 +107,10 @@ class ClientTransferController:
       if not i.transfer_finished:
         return False
     return True
+
+  def get_files_transfered(self):
+    return reduce(lambda x, y: x + (1 if y.transfer_finished else 0), self.transfer_agents, 0)
+
 
   def is_transfer_success(self):
     return reduce(lambda y, x: 0 + y if x.transfer_success is True else 1 + y, self.transfer_agents, 0) == 0

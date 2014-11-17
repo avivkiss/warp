@@ -1,8 +1,9 @@
 from config import *
 from common_tools import *
 from blessings import Terminal
-import time
+import time, threading
 
+SLEEP_TIME = 0.1
 
 class WarpInterface(object):
   def __init__(self):
@@ -20,7 +21,7 @@ class WarpInterface(object):
 
 
   def log_message(self, message):
-    self.screen.add_component(Component(label=message))
+    self.screen.add_component(Component(message))
     self.redraw()
 
   def redraw(self):
@@ -73,6 +74,7 @@ class Screen(object):
       self.next_line_bottom += 1
 
   def exit(self):
+    print self.screen.clear()
     print self.term.exit_fullscreen()
 
 
@@ -91,44 +93,58 @@ class Line(object):
       yield each
 
 class Component(object):
-  def __init__(self, label=""):
-    self.label = label
+  def __init__(self, value=""):
+    self.value = value
+    self.active = True
 
-  def set_label(self, label):
-    self.label = label
+  def set_label(self, value):
+    self.value = value
+
+  def set_update(self, func):
+    def update():
+      while self.active:
+        self.value = func()
+        time.sleep(SLEEP_TIME)
+
+    thread = threading.Thread(target=update)
+    thread.setDaemon(True)
+    thread.start()
+
 
   def __str__(self):
-    return self.label
+    return self.value
 
 class CounterComponent(Component):
   def __init__(self, format="{}"):
-    self.count = 0
+    self.value = 0
     self.format = format
+    self.active = True
 
   def increment(self):
-    self.count += 1
-
-  def update(self, count):
-    self.count = count
+    self.value += 1
 
   def __str__(self):
-    return self.format.format(self.count)
+    return self.format.format(self.value)
 
 class ProgressComponent(Component):
-  def __init__(self, label="Progress", fill_char='#', empty_char =' ', expected_size=100, width=32, progress=0):
+  def __init__(self, label="Progress", fill_char='#', empty_char =' ', expected_size=100, progress=0):
     super(ProgressComponent, self).__init__(label)
     self.expected_size = expected_size
     self.fill_char = fill_char
     self.progress = progress
     self.empty_char = empty_char
-    self.width = width
+    self.term = Terminal()
+    self.label = label
 
-  def update(self, progress):
-    self.progress = progress
+    self.value = (expected_size, progress)
 
   def __str__(self):
-    p = self.progress * self.width // self.expected_size
-    return self.label + ": [" + self.fill_char * p + self.empty_char * (self.width - p) + "]"
+    self.progress = self.value[1]
+    self.expected_size = self.value[0]
+
+    width = self.term.width - len(self.label) - 4
+    p = self.progress * width // self.expected_size
+    return self.label + ": [" + self.fill_char * p + self.empty_char * (width - p) + "]"
 
 def main():
   s = WarpInterface()
