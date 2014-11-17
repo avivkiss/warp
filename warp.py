@@ -9,7 +9,7 @@ from common_tools import *
 from connection import Connection
 from client_transfer_controller import ClientTransferController
 import plac
-import sys, time, logging
+import sys, time, logging, mock
 from progress import WarpInterface
 
 @plac.annotations(
@@ -25,13 +25,15 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
 
+  gui = WarpInterface()
+
   if verbose:
     logger.setLevel(logging.DEBUG)
+    gui = mock.Mock()
 
   startTime = time.time()
 
   # Start up the user interface
-  gui = WarpInterface()
   gui.redraw()
 
   # Start an ssh connection used by the xmlrpc connection,
