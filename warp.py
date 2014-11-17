@@ -12,6 +12,8 @@ import plac
 import sys, time, logging, mock
 from progress import WarpInterface
 
+gui = WarpInterface()
+
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
     recursive = ('Transfer directory', 'flag', 'r'),
@@ -25,10 +27,9 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
 
-  gui = WarpInterface()
-
   if verbose:
     logger.setLevel(logging.DEBUG)
+    global gui
     gui = mock.Mock()
 
   startTime = time.time()
@@ -57,6 +58,8 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   start_thread.join()
   gui.progress_bar.set_update(lambda: (controller.transfer_size, controller.get_server_received_size(), controller.is_transfer_validating()))
 
+  success = False
+
   if controller.start_success:
     gui.log_message("Start success.")
 
@@ -66,6 +69,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
 
     if controller.is_transfer_success():
       logger.debug("Done with transfer.")
+      success = True
     else:
       logger.warn("Failed to send file.")
 
@@ -75,10 +79,13 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   channel.close()
   logger.debug("Closed connections.")
 
+  gui.exit()
   if timer:
     logger.info("Total time: " + str(time.time() - startTime))
-
-  gui.exit()
+  if success:
+    print "Successfully transfered"
+  else:
+    print "Failed to transfer"
   sys.exit()
 
 
@@ -86,4 +93,5 @@ if __name__ == '__main__':
   try:
     plac.call(main)
   except KeyboardInterrupt:
+    gui.exit()
     logger.warn("Transfer canceled")
