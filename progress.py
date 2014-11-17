@@ -11,14 +11,13 @@ class WarpInterface(object):
 
     self.progress_bar = ProgressComponent()
     self.screen.add_component(self.progress_bar, to_bottom=True)
-    
+
     self.status_line = Line()
     self.files_sent_indicator = CounterComponent(format="Sent {} files. ")
     self.files_processed_indicator = CounterComponent(format="Processed {} files.")
     self.status_line.add_component(self.files_sent_indicator)
     self.status_line.add_component(self.files_processed_indicator)
     self.screen.add_line(self.status_line, to_bottom=True)
-
 
   def log_message(self, message):
     self.screen.add_component(Component(message))
@@ -47,7 +46,6 @@ class Screen(object):
     for n, line in self.top_lines.iteritems():
       with self.term.location(0, n):
         for component in line:
-          # print "n: " + str(self.term.height -n)
           print str(component),
 
     for n, line in self.bottom_lines.iteritems():
@@ -92,6 +90,7 @@ class Line(object):
     for each in self.components:
       yield each
 
+
 class Component(object):
   def __init__(self, value=""):
     self.value = value
@@ -110,9 +109,9 @@ class Component(object):
     thread.setDaemon(True)
     thread.start()
 
-
   def __str__(self):
     return self.value
+
 
 class CounterComponent(Component):
   def __init__(self, format="{}"):
@@ -126,8 +125,9 @@ class CounterComponent(Component):
   def __str__(self):
     return self.format.format(self.value)
 
+
 class ProgressComponent(Component):
-  def __init__(self, label="Progress", fill_char='#', empty_char =' ', expected_size=100, progress=0):
+  def __init__(self, label="Progress", fill_char='#', empty_char=' ', expected_size=100, progress=0):
     super(ProgressComponent, self).__init__(label)
     self.expected_size = expected_size
     self.fill_char = fill_char
@@ -145,19 +145,3 @@ class ProgressComponent(Component):
     width = self.term.width - len(self.label) - 4
     p = self.progress * width // self.expected_size
     return self.label + ": [" + self.fill_char * p + self.empty_char * (width - p) + "]"
-
-def main():
-  s = WarpInterface()
-
-  s.redraw()
-  time.sleep(4)
-
-  s.exit()
-
-
-
-
-  # print s.bottom_lines
-
-if __name__ == '__main__':
-  main()

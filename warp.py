@@ -8,9 +8,8 @@ from config import *
 from common_tools import *
 from connection import Connection
 from client_transfer_controller import ClientTransferController
-import plac, threading
+import plac
 import sys, time, logging
-from clint.textui import progress
 from progress import WarpInterface
 
 @plac.annotations(
@@ -48,20 +47,17 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   logger.debug("Starting transfer")
   gui.log_message("Starting transfer")
 
-
   start_thread = controller.start()
 
-  gui.files_processed_indicator.set_update(lambda : controller.files_processed)
-  gui.files_sent_indicator.set_update(lambda : controller.get_files_transfered())
-  
-  start_thread.join()
-  gui.progress_bar.set_update(lambda : (controller.transfer_size, controller.get_server_received_size()
-))
+  gui.files_processed_indicator.set_update(lambda: controller.files_processed)
+  gui.files_sent_indicator.set_update(lambda: controller.get_files_transfered())
 
+  start_thread.join()
+  gui.progress_bar.set_update(lambda: (controller.transfer_size, controller.get_server_received_size()))
 
   if controller.start_success:
     gui.log_message("Start success.")
-      
+
     while not controller.is_transfer_finished():
       # gui.log_message("Status retrieved.")
       # if(received == controller.transfer_size) and controller.is_transfer_validating():
