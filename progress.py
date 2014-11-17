@@ -102,7 +102,10 @@ class Component(object):
   def set_update(self, func):
     def update():
       while self.active:
-        self.value = func()
+        try:
+          self.value = func()
+        except:
+          break
         time.sleep(SLEEP_TIME)
 
     thread = threading.Thread(target=update)
