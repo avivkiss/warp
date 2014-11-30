@@ -5,10 +5,11 @@ import os
 
 
 class FileTransferAgent:
-  def __init__(self, udt, transfer_manager, file_name, file_dest, verify, createDirs):
+  def __init__(self, udt, transfer_manager, file_name, file_dest, verify, createDirs, stat):
     self.file_dest = file_dest
     self.file_name = file_name
     self.verify = verify
+    self.stat = stat
     self.is_transfering = False
     self.transfer_finished = False
     self.transfer_success = False
@@ -113,6 +114,11 @@ class FileTransferAgent:
     self.udt.connect()
     self.is_transfering = True
     self.udt.send_file(self.file_name, self.server_file_path, self.block_count, self.file_size)
+
+    if self.stat:
+      stats = os.stat(self.file_name)
+      self.transfer_manager.set_timestamps(self.server_file_path, (stats.st_atime, stats.st_mtime))
+      self.transfer_manager.set_protection(self.server_file_path, stats.st_mode)
 
     self.is_transfering = False
 

@@ -7,7 +7,7 @@ from file_transfer_agent import FileTransferAgent
 
 
 class ClientTransferController:
-  def __init__(self, server_channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links):
+  def __init__(self, server_channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links, stat):
     self.server_channel = server_channel
     self.hostname = hostname
     self.file_src = file_src
@@ -18,6 +18,7 @@ class ClientTransferController:
     self.tcp_mode = tcp_mode
     self.parallelism = parallelism
     self.follow_links = follow_links
+    self.stat = stat
     self.transfer_agents = []
     self.start_success = None
 
@@ -42,7 +43,7 @@ class ClientTransferController:
     transfer_manager = self.server_channel.root.get_transfer_manager()
     if not self.recursive:
       try:
-        transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, self.file_src, self.file_dest, self.verify, False)
+        transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, self.file_src, self.file_dest, self.verify, False, self.stat)
         self.files_processed += 1
       except EOFError:
         logger.error("Could not connect")
@@ -61,11 +62,11 @@ class ClientTransferController:
           file_dest = os.path.join(self.file_root_dest, server_directory, f)
           file_src = os.path.join(directory, f)
           try:
-            transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, file_src, file_dest, self.verify, True)
+            transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, file_src, file_dest, self.verify, True, self.stat)
           except EOFError:
             logger.error("Could not connect")
             self.start_success = False
-            return 
+            return
 
           self.files_processed += 1
           self.transfer_agents.append(transfer_agent)

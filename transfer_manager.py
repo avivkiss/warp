@@ -32,6 +32,12 @@ class TransferManager:
     else:
       return os.path.getsize(filepath)
 
+  def set_timestamps(self, filepath, times):
+    os.utime(filepath, times)
+
+  def set_protection(self, filepath, bits):
+      os.chmod(filepath, bits)
+
   def get_size_and_init_file_path(self, filepath):
     if not os.path.isfile(filepath):
       output_file = open(filepath, "w")

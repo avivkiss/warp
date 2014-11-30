@@ -21,8 +21,9 @@ gui = WarpInterface()
     disable_verify = ('Disable verify', 'flag', 'w'),
     verbose = ('Enable logging', 'flag', 'v'),
     timer = ('Time transfer', 'flag', 'T'),
-    follow_links = ('Follow symbolic links', 'flag', 'L'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, timer, follow_links, verbose=False, custom_comm_port=PORT, parallelism=3):
+    follow_links = ('Follow symbolic links', 'flag', 'L'),
+    copy_status = ('Copy file permissions/timestamps', 'flag', 's'))
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, timer, follow_links, copy_status, verbose=False, custom_comm_port=PORT, parallelism=3):
   # Extract the username and hostname from the arguments,
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
@@ -45,7 +46,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   # get the rpc channel
   channel = connection.channel
 
-  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links)
+  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links, copy_status)
 
   logger.debug("Starting transfer")
   gui.log_message("Starting transfer")
