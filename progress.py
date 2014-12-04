@@ -2,7 +2,7 @@ from __future__ import division
 from config import *
 from common_tools import *
 from blessings import Terminal
-import time, threading
+import time, threading, sys
 
 SLEEP_TIME = 0.1
 
@@ -100,11 +100,15 @@ class Component(object):
   def set_label(self, value):
     self.value = value
 
+  def updateCallback(self):
+    pass
+
   def set_update(self, func):
     def update():
       while self.active:
         try:
           self.value = func()
+          self.updateCallback()
         except:
           break
         time.sleep(SLEEP_TIME)
@@ -140,8 +144,18 @@ class ProgressComponent(Component):
     self.term = Terminal()
     self.label = label
     self.units = ["bytes", "KB", "MB", "GB", "TB"]
+    self.lastProgress = [0, 0]
+    self.lastUpdated = time.time()
+    self.timeDiff = 0
 
     self.value = (expected_size, progress, False)
+
+  def updateCallback(self):
+    if self.progress > self.lastProgress[1] and time.time() != self.lastUpdated:
+        self.lastProgress[0] = self.lastProgress[1]
+        self.lastProgress[1] = self.progress
+        self.timeDiff = time.time() - self.lastUpdated
+        self.lastUpdated = time.time()
 
   def printableUnits(self, value):
     i = 0
@@ -162,10 +176,18 @@ class ProgressComponent(Component):
     j = self.printableUnits(self.progress)
 
     progress = "{0:.3f}".format(self.progress/pow(1000, j)) + self.units[j] + "/" + "{0:.3f}".format(self.expected_size/pow(1000, i)) + self.units[i]
+    speed = 0
+    if self.timeDiff != 0:
+        speed = (self.lastProgress[1] - self.lastProgress[0])/self.timeDiff
+    # speed is currently in bytes per second
+    k = self.printableUnits(speed)
+    progress += " " + "{0:.3f}".format(speed/pow(1000, k)) + self.units[k] + "/s"
 
     width = self.term.width - len(self.label) - 5 - len(progress)
     if self.expected_size != 0:
         p = self.progress * width // self.expected_size
     else:
         p = 0
+    if self.lastProgress < self.progress:
+        self.lastProgress = self.progress
     return self.label + ": [" + self.fill_char * p + self.empty_char * (width - p) + "]" + " " + progress
