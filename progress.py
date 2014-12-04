@@ -1,3 +1,4 @@
+from __future__ import division
 from config import *
 from common_tools import *
 from blessings import Terminal
@@ -148,7 +149,19 @@ class ProgressComponent(Component):
     if self.value[2] and self.progress == self.expected_size:
       self.fill_char = "V"
 
-    progress = str(self.progress) + "/" + str(self.expected_size)
+    i = 0
+    for i in range(1, 5):
+        if self.expected_size // pow(1000, i) == 0:
+            break
+    i-=1
+    j = 0
+    for j in range(1, 5):
+        if self.progress // pow(1000, j) == 0:
+            break
+    j-=1
+    units = ["bytes", "KB", "MB", "GB"]
+
+    progress = "{0:.3f}".format(self.progress/pow(1000, j)) + units[j] + "/" + "{0:.3f}".format(self.expected_size/pow(1000, i)) + units[i]
 
     width = self.term.width - len(self.label) - 5 - len(progress)
     if self.expected_size != 0:
