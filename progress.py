@@ -139,8 +139,17 @@ class ProgressComponent(Component):
     self.empty_char = empty_char
     self.term = Terminal()
     self.label = label
+    self.units = ["bytes", "KB", "MB", "GB", "TB"]
 
     self.value = (expected_size, progress, False)
+
+  def printableUnits(self, value):
+    i = 0
+    for i in range(1, len(self.units)+1):
+        if value // pow(1000, i) == 0:
+            break
+    i-=1
+    return i
 
   def __str__(self):
     self.progress = self.value[1]
@@ -149,19 +158,10 @@ class ProgressComponent(Component):
     if self.value[2] and self.progress == self.expected_size:
       self.fill_char = "V"
 
-    i = 0
-    for i in range(1, 6):
-        if self.expected_size // pow(1000, i) == 0:
-            break
-    i-=1
-    j = 0
-    for j in range(1, 6):
-        if self.progress // pow(1000, j) == 0:
-            break
-    j-=1
-    units = ["bytes", "KB", "MB", "GB", "TB"]
+    i = self.printableUnits(self.expected_size)
+    j = self.printableUnits(self.progress)
 
-    progress = "{0:.3f}".format(self.progress/pow(1000, j)) + units[j] + "/" + "{0:.3f}".format(self.expected_size/pow(1000, i)) + units[i]
+    progress = "{0:.3f}".format(self.progress/pow(1000, j)) + self.units[j] + "/" + "{0:.3f}".format(self.expected_size/pow(1000, i)) + self.units[i]
 
     width = self.term.width - len(self.label) - 5 - len(progress)
     if self.expected_size != 0:
