@@ -130,7 +130,7 @@ class CounterComponent(Component):
 
 
 class ProgressComponent(Component):
-  def __init__(self, label="Progress", fill_char='#', empty_char=' ', expected_size=100, progress=0):
+  def __init__(self, label="Progress", fill_char='#', empty_char=' ', expected_size=0, progress=0):
     super(ProgressComponent, self).__init__(label)
     self.expected_size = expected_size
     self.fill_char = fill_char
@@ -148,6 +148,11 @@ class ProgressComponent(Component):
     if self.value[2] and self.progress == self.expected_size:
       self.fill_char = "V"
 
-    width = self.term.width - len(self.label) - 4
-    p = self.progress * width // self.expected_size
-    return self.label + ": [" + self.fill_char * p + self.empty_char * (width - p) + "]"
+    progress = str(self.progress) + "/" + str(self.expected_size)
+
+    width = self.term.width - len(self.label) - 5 - len(progress)
+    if self.expected_size != 0:
+        p = self.progress * width // self.expected_size
+    else:
+        p = 0
+    return self.label + ": [" + self.fill_char * p + self.empty_char * (width - p) + "]" + " " + progress
