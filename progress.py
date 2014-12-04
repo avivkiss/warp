@@ -150,16 +150,16 @@ class ProgressComponent(Component):
       self.fill_char = "V"
 
     i = 0
-    for i in range(1, 5):
+    for i in range(1, 6):
         if self.expected_size // pow(1000, i) == 0:
             break
     i-=1
     j = 0
-    for j in range(1, 5):
+    for j in range(1, 6):
         if self.progress // pow(1000, j) == 0:
             break
     j-=1
-    units = ["bytes", "KB", "MB", "GB"]
+    units = ["bytes", "KB", "MB", "GB", "TB"]
 
     progress = "{0:.3f}".format(self.progress/pow(1000, j)) + units[j] + "/" + "{0:.3f}".format(self.expected_size/pow(1000, i)) + units[i]
 
