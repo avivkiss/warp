@@ -42,12 +42,12 @@ class Connection:
     self.connect_ssh()
 
     # Now we start the port forwarding
-    channel = forward_tunnel(self.comm_port, '127.0.0.1', self.comm_port, self.client.get_transport())
+    channel = forward_tunnel(0, '127.0.0.1', self.comm_port, self.client.get_transport())
     self.forward_thread = threading.Thread(target=start_tunnel, args=(channel,))
     self.forward_thread.setDaemon(True)
     self.forward_thread.start()
 
-    self.channel = rpyc.connect("localhost", port=self.comm_port, config={"allow_public_attrs": True})
+    self.channel = rpyc.connect("localhost", port=channel.socket.getsockname()[1], config={"allow_public_attrs": True})
 
     return self.channel
 
