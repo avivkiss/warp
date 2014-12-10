@@ -2,7 +2,7 @@ warp
 ====
 
 FTL-FTP  
-
+ n
 ## Introduction
 **warp** is a file transfer utility that uses UDT as its data transfer protocol. **warp** is currently in *alpha* and as such is not yet feature complete. **warp** is intended to mimic the basic functionality of standard ftp clients.
 
@@ -36,7 +36,7 @@ The first step is installing UDT. To do this we will download and build UDT from
 
 ### Install warp
 1. **Clone warp:** You can install warp anywhere on your system, but we recommend installing it in the `~/.warp` directory. You can do this with the following command: `git clone https://github.com/avivkiss/warp.git ~/.warp`.
-2. **Python dependencies:** warp was built and tested with python 2.7. In order to install the required python packages you must have pip installed. If you do not see the pip [installation page](https://pip.pypa.io/en/latest/installing.html) for more details (on Ubuntu you can just type `apt-get install python-pip`. Once you have pip installed you can install the requirements with the following commands:
+2. **Python dependencies:** warp was built and tested with python 2.7. In order to install the required python packages you must have pip installed. If you do not see the pip [installation page](https://pip.pypa.io/en/latest/installing.html) for more details (on Ubuntu you can just type `apt-get install python-pip`. If you are usign CentOS see the [folowing instructions](https://www.digitalocean.com/community/tutorials/how-to-set-up-python-2-7-6-and-3-3-3-on-centos-6-4) for installing pip. Once you have pip installed you can install the requirements with the following commands:
     - Ubuntu: `sudo apt-get install python-dev libxml2-dev libxslt-dev`
     - `pip install -r ~/.warp/requirements.txt`
 3. **Symbolic Links:** In order to use warp as intended you must install 2 symbolic links that will be present in your default path. You can do this with the following two commands:
