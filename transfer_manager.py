@@ -55,6 +55,9 @@ class TransferManager:
         size += os.path.getsize(path)
     return size
 
+  def finish(self):
+    sys.exit()
+
   def validate_filepath(self, filepath, client_path, create_dirs):
     """
     Validates the filepath, and returns the correct path

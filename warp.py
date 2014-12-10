@@ -23,7 +23,7 @@ gui = WarpInterface()
     timer = ('Time transfer', 'flag', 'T'),
     follow_links = ('Follow symbolic links', 'flag', 'L'),
     copy_status = ('Copy file permissions/timestamps', 'flag', 's'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, timer, follow_links, copy_status, verbose=False, custom_comm_port=PORT, parallelism=3):
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, timer, follow_links, copy_status, verbose=False, parallelism=3):
   # Extract the username and hostname from the arguments,
   # the ssh_port does not need to be specified, will default to 22.
   username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
@@ -40,7 +40,7 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
 
   # Start an ssh connection used by the xmlrpc connection,
   # the comm_port is used for port forwarding.
-  connection = Connection(hostname=hostname, username=username, ssh_port=ssh_port, comm_port=custom_comm_port)
+  connection = Connection(hostname=hostname, username=username, ssh_port=ssh_port)
   connection.connect()
 
   # get the rpc channel

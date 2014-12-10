@@ -11,7 +11,7 @@ from rpyc.utils.server import ThreadedServer
 from common_tools import *
 import plac
 from server_transfer_controller import ServerTransferController
-import os
+import os, sys
 from os.path import expanduser
 
 logger.propagate = True
@@ -19,7 +19,9 @@ logger.propagate = True
 
 def main():
   os.chdir(expanduser("~"))
-  server = ThreadedServer(ServerTransferController, hostname='localhost', port=PORT, protocol_config={"allow_public_attrs": True})
+  server = ThreadedServer(ServerTransferController, hostname='localhost', port=0, protocol_config={"allow_public_attrs": True})
+  sys.stderr.write(str(server.port))
+  sys.stderr.write('     ')
   server.start()
 
 

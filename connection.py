@@ -16,11 +16,10 @@ logging.getLogger("paramiko").setLevel(logging.WARNING)
 
 
 class Connection:
-  def __init__(self, hostname, username, ssh_port=22, comm_port=PORT):
+  def __init__(self, hostname, username, ssh_port=22):
     self.channel = None
     self.hostname = hostname
     self.username = username
-    self.comm_port = comm_port
     self.ssh_port = ssh_port
 
   def connect_ssh(self):
@@ -30,8 +29,12 @@ class Connection:
 
     try:
       self.client.connect(self.hostname, username=self.username, port=self.ssh_port)
+      (sshin1, sshout1, ssherr1) = self.client.exec_command("~/warp/server.py")
+      self.comm_port = int(ssherr1.read(5))
     except (paramiko.PasswordRequiredException, paramiko.AuthenticationException, paramiko.ssh_exception.SSHException):
       password = getpass.getpass('Password for %s@%s: ' % (self.username, self.hostname))
+      (sshin1, sshout1, ssherr1) = self.client.exec_command("~/warp/server.py")
+      self.comm_port = int(ssherr1.read(5))
       try:
         self.client.connect(self.hostname, username=self.username, port=self.ssh_port, password=password)
       except paramiko.AuthenticationException as message:
