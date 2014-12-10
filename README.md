@@ -14,18 +14,18 @@ At the current moment the installation procedure is a bit involved and requires 
 ### UDT
 The first step is installing UDT. To do this we will download and build UDT from source. 
 
-1. **Install git:** Feel free to skip this step if you have git installed already. If you do not have git installed (it should be by default on Mac) you can install it Ubuntu using `apt-get install git`. If you do not have Ubuntu please refer to the [git installation page](http://git-scm.com/book/en/Getting-Started-Installing-Git).
+1. **Install git:** Feel free to skip this step if you have git installed already. If you do not have git installed (it should be by default on Mac) you can install it Ubuntu using `apt-get install git` or on CentOS `sudo yum install git`. If you do not have Ubuntu please refer to the [git installation page](http://git-scm.com/book/en/Getting-Started-Installing-Git).
 2. **Clone the repo:** From here on out we will be assuming that you are in the current user's home directory. To clone the udt repository into a local folder use the following command: `git clone git://git.code.sf.net/p/udt/git udt-git`.
 3. **Make UDT:** More, or less depending on how you look at it, detailed instructions are available at the [UDT documentation](http://udt.sourceforge.net/udt4/doc/make.htm). If you are following along here:
     - `cd udt-git/udt4/`
-    - The make command for UDT takes the following format: ` make -e os=XXX arch=YYY` where os can be LINUX, BSD, and OSX, and arch IA32, IA64, POWERPC, and AMD64. For Ubuntu on an x86-64 CPU the command looks like this `make -e os=LINUX arch=AMD64`. (You may also have to install make and g++ is not installed on Ubuntu type `apt-get install make` and `apt-get install g++`).
+    - The make command for UDT takes the following format: ` make -e os=XXX arch=YYY` where os can be LINUX, BSD, and OSX, and arch IA32, IA64, POWERPC, and AMD64. For Ubuntu/CentOS on an x86-64 CPU the command looks like this `make -e os=LINUX arch=AMD64`. (You may also have to install make and g++ is not installed on Ubuntu type `apt-get install make` and `apt-get install g++` or `yum install gcc-c++` on CentOS).
 4. **Installing UDT:** To install UDT we must but the `UDT.h` header file as well as the library file compiled by the make command into a directory that will be in your path. I copied my header file into `/usr/include` and my library files into `/usr/lib`, you may need root privileges to do this.
     - On Mac OS X:
         - `mkdir /usr/include/udt`
         - `cp ~/udt-git/udt4/src/udt.h /usr/include/udt/udt.h`
         - `cp src/libudt.a /usr/lib/libudt.a`
         - `cp src/libudt.dylib /usr/lib/libudt.dylib`
-    - On Ubuntu:
+    - On Ubuntu/CentOS:
         - `mkdir /usr/include/udt`
         - `cp ~/udt-git/udt4/src/udt.h /usr/include/udt/udt.h`
         - `cp src/libudt.a /usr/lib/libudt.a`
