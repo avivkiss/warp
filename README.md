@@ -4,7 +4,7 @@ warp
 FTL-FTP  
 
 ## Introduction
-**warp** is a file transfer utility that uses UDT as its data transfer protocol. **warp** is currently in *alpha* and as such is not yet feature complete. **warp** is intended to mimic the basic functionality of standard ftp clients. At the moment it is missing support for many command line options, one notable current omission is directory transfers. 
+**warp** is a file transfer utility that uses UDT as its data transfer protocol. **warp** is currently in *alpha* and as such is not yet feature complete. **warp** is intended to mimic the basic functionality of standard ftp clients.
 
 ## Installation
 These instructions are for installing on Ubuntu or Max OS X. There is no reason why this can't be installed on any Linux distro, but the distros differ in package managers and the instructions here are tailored to Ubuntu. For installing on Mac, make sure you have the developer tools installed.
