@@ -157,10 +157,10 @@ class ProgressComponent(Component):
         self.timeDiff = time.time() - self.lastUpdated
         self.lastUpdated = time.time()
 
-  def printableUnits(self, value):
+  def printableUnits(self, value, base=1000):
     i = 0
     for i in range(1, len(self.units)+1):
-        if value // pow(1000, i) == 0:
+        if value // pow(base, i) == 0:
             break
     i-=1
     return i
@@ -172,10 +172,11 @@ class ProgressComponent(Component):
     if self.value[2] and self.progress == self.expected_size:
       self.fill_char = "V"
 
-    i = self.printableUnits(self.expected_size)
-    j = self.printableUnits(self.progress)
+    baseDiskSize = pow(2, 10)
+    i = self.printableUnits(self.expected_size, baseDiskSize)
+    j = self.printableUnits(self.progress, baseDiskSize)
 
-    progress = "{0:.3f}".format(self.progress/pow(1000, j)) + self.units[j] + "/" + "{0:.3f}".format(self.expected_size/pow(1000, i)) + self.units[i]
+    progress = "{0:.3f}".format(self.progress/pow(baseDiskSize, j)) + self.units[j] + "/" + "{0:.3f}".format(self.expected_size/pow(baseDiskSize, i)) + self.units[i]
     speed = 0
     if self.timeDiff != 0:
         speed = (self.lastProgress[1] - self.lastProgress[0])/self.timeDiff
