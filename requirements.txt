@@ -5,3 +5,4 @@ ecdsa==0.11
 udt4py==1.2
 rpyc==3.3.0
 blessings==1.6.0
+mock=1.0.1
