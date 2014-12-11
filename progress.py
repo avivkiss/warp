@@ -77,6 +77,10 @@ class Screen(object):
       self.next_line_bottom += 1
 
   def exit(self):
+    for line in (self.bottom_lines + self.top_lines):
+      for componenet in line.componenet:
+        componenet.active = False
+
     print self.term.clear()
     print self.term.exit_fullscreen()
 
