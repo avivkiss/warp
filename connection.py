@@ -33,7 +33,7 @@ class Connection:
       self.comm_port = int(ssherr1.read(5))
     except (paramiko.PasswordRequiredException, paramiko.AuthenticationException, paramiko.ssh_exception.SSHException):
       password = getpass.getpass('Password for %s@%s: ' % (self.username, self.hostname))
-      (sshin1, sshout1, ssherr1) = self.client.exec_command("~/warp/server.py")
+      (sshin1, sshout1, ssherr1) = self.client.exec_command("warp-server")
       self.comm_port = int(ssherr1.read(5))
       try:
         self.client.connect(self.hostname, username=self.username, port=self.ssh_port, password=password)
