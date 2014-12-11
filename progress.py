@@ -30,6 +30,9 @@ class WarpInterface(object):
   def exit(self):
     self.screen.exit()
 
+  def fullscreen(self):
+    self.screen.fullscreen()
+
 
 class Screen(object):
   def __init__(self):
@@ -39,6 +42,7 @@ class Screen(object):
     self.next_line_top = 0
     self.next_line_bottom = 1
 
+  def fullscreen(self):
     print self.term.enter_fullscreen()
 
   def redraw(self):

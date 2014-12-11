@@ -32,6 +32,8 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
     logger.setLevel(logging.DEBUG)
     global gui
     gui = mock.Mock()
+  else:
+    gui.fullscreen()
 
   startTime = time.time()
 
