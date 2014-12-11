@@ -6,93 +6,93 @@ This is the main driver script that will run on the client.
 
 from config import *
 from common_tools import *
-import random, os.path
-from handshake import handshake
-from clint.textui import progress
+from connection import Connection
+from client_transfer_controller import ClientTransferController
 import plac
+import sys, time, logging, mock
+from progress import WarpInterface
+
+gui = WarpInterface()
 
 @plac.annotations(
     tcp_mode=('TCP mode', 'flag', 't'),
-    recursive = ('prints', 'flag', 'r'),
-    disable_verify = ('Disable verify', 'flag', 'v'))
-def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify):
-  (head, tail) = os.path.split(file_src)
+    recursive = ('Transfer directory', 'flag', 'r'),
+    parallelism = ('parallelism', 'option', 'p', int),
+    disable_verify = ('Disable verify', 'flag', 'w'),
+    verbose = ('Enable logging', 'flag', 'v'),
+    timer = ('Time transfer', 'flag', 'T'),
+    follow_links = ('Follow symbolic links', 'flag', 'L'),
+    copy_status = ('Copy file permissions/timestamps', 'flag', 's'))
+def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, timer, follow_links, copy_status, verbose=False, parallelism=3):
+  # Extract the username and hostname from the arguments,
+  # the ssh_port does not need to be specified, will default to 22.
+  username, hostname, ssh_port = Connection.unpack_remote_host(remote_host)
 
-  global TCP_MODE
-  TCP_MODE = tcp_mode
+  if verbose:
+    logger.setLevel(logging.DEBUG)
+    global gui
+    gui = mock.Mock()
 
-  logger.info("Using TCP: " + str(TCP_MODE))
+  startTime = time.time()
 
-  if os.path.isdir(file_src) and not recursive:
-    logger.error("%s is a directory", file_src)
-    return
-  elif not tail and os.path.isfile(head):
-    logger.error("%s: not a directory", file_src)
-    return
-  elif not os.path.isdir(file_src) and \
-    not os.path.isfile(file_src):
-      logger.error("%s no such file or directory", file_src)
-      return
-  username, hostname, ssh_port = unpack_remote_host(remote_host)
-  nonce = generate_nonce()
-  file_hash = getHash(file_src)
-  # handshake should be returning a tuple, port and numblocks TODO
-  sock, block_count = handshake(username=username, hostname=hostname, \
-    nonce=nonce, file_dest=file_dest, file_hash=file_hash, \
-    file_size=os.path.getsize(file_src), file_src=file_src, tcp_mode=tcp_mode, \
-    disable_verify=disable_verify)
+  # Start up the user interface
+  gui.redraw()
 
-  send_data(sock, file_src, block_count)
+  # Start an ssh connection used by the xmlrpc connection,
+  # the comm_port is used for port forwarding.
+  connection = Connection(hostname=hostname, username=username, ssh_port=ssh_port)
+  connection.connect()
 
-def send_data(sock, file_src, block_count = 0):
-  """
-  Opens the file at the number of blocks passed in and uses that along with
-  the other parameters to send a file to the host at the specified port.
-  """
-  f = open(file_src, 'r')
-  f.seek(block_count * CHUNK_SIZE)
-  data = f.read(CHUNK_SIZE)
-  with progress.Bar(label="", expected_size=os.path.getsize(file_src)) as bar:
-    while data :
-      bar.show(f.tell())
-      # TODO make this same array every time
-      if not TCP_MODE:
-        sendChunk(sock, bytearray(data))
-      else:
-        sock.sendall(data)
-      data = f.read(CHUNK_SIZE)
-  logger.info("Data sent.")
-  sock.close()
+  # get the rpc channel
+  channel = connection.channel
 
-def sendChunk(sock, data):
-  size = sock.send(data)
-  if not size == len(data):
-    sendChunk(sock, data[size:])
+  controller = ClientTransferController(channel, hostname, file_src, file_dest, recursive, tcp_mode, disable_verify, parallelism, follow_links, copy_status)
 
-def generate_nonce(length=NONCE_SIZE):
-  """Generate pseudorandom number. Ripped from google."""
-  return ''.join([str(random.randint(0, 9)) for i in range(length)])
+  logger.debug("Starting transfer")
+  gui.log_message("Starting transfer")
 
+  start_thread = controller.start()
 
-def unpack_remote_host(remote_host):
-  """
-  Parses the hostname and breaks it into host and user. Modified from paramiko
-  """
-  username = ''
-  hostname = ''
-  port = 22
+  gui.files_processed_indicator.set_update(lambda: controller.files_processed)
+  gui.files_sent_indicator.set_update(lambda: controller.get_files_transfered())
 
-  if remote_host.find('@') >= 0:
-    username, hostname = remote_host.split('@')
+  start_thread.join()
+  gui.progress_bar.set_update(lambda: (controller.transfer_size, controller.get_server_received_size(), controller.is_transfer_validating()))
 
-  if len(hostname) == 0 or len(username) == 0:
-    fail('Hostname/username required.')
+  success = False
 
-  if hostname.find(':') >= 0:
-    hostname, portstr = hostname.split(':')
-    port = int(portstr)
+  if controller.start_success:
+    gui.log_message("Start success.")
 
-  return (username, hostname, port)
+    while not controller.is_transfer_finished():
+      gui.redraw()
+      time.sleep(0.1)
+
+    if controller.is_transfer_success():
+      logger.debug("Done with transfer.")
+      success = True
+    else:
+      logger.warn("Failed to send file.")
+
+  gui.redraw()
+  controller.close()
+  connection.close()
+  channel.close()
+  logger.debug("Closed connections.")
+
+  gui.exit()
+  if timer:
+    logger.info("Total time: " + str(time.time() - startTime))
+  if success:
+    print "Successfully transfered"
+  else:
+    print "Failed to transfer"
+  sys.exit()
+
 
 if __name__ == '__main__':
-  plac.call(main)
+  try:
+    plac.call(main)
+  except KeyboardInterrupt:
+    gui.exit()
+    logger.warn("Transfer canceled")
