@@ -79,10 +79,11 @@ class ClientUDTManager:
     f = open(file_src, 'r')
     f.seek(block_count * CHUNK_SIZE)
     data = f.read(CHUNK_SIZE)
+    byteData = bytearray(CHUNK_SIZE)
     while data:
-      # TODO make this same array every time
       if not self.tcp_mode:
-        self.send_chunk(bytearray(data))
+        byteData[0:CHUNK_SIZE] = data
+        self.send_chunk(byteData)
       else:
         self.socket.sendall(data)
       data = f.read(CHUNK_SIZE)
