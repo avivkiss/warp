@@ -118,4 +118,5 @@ class ClientTransferController:
     return reduce(lambda y, x: 0 + y if x.transfer_success is True else 1 + y, self.transfer_agents, 0) == 0
 
   def close(self):
-    self.server_channel.root.get_transfer_manager().finish()
+    # self.server_channel.root.get_transfer_manager().finish()
+    pass

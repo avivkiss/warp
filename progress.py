@@ -77,9 +77,11 @@ class Screen(object):
       self.next_line_bottom += 1
 
   def exit(self):
-    for line in (self.bottom_lines + self.top_lines):
-      for componenet in line.componenet:
-        componenet.active = False
+    for line in self.bottom_lines.itervalues(): 
+      line.exit()
+
+    for line in self.top_lines.itervalues(): 
+      line.exit()
 
     print self.term.clear()
     print self.term.exit_fullscreen()
@@ -94,6 +96,10 @@ class Line(object):
 
   def add_component(self, component):
     self.components.append(component)
+
+  def exit(self):
+    for componenet in self.components:
+      componenet.active = False
 
   def __iter__(self):
     for each in self.components:

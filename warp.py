@@ -76,9 +76,13 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
     else:
       logger.warn("Failed to send file.")
 
+  logger.debug("Redrawing GUI.")
   gui.redraw()
+  logger.debug("Closing Controller.")
   controller.close()
+  logger.debug("Closing Connection.")
   connection.close()
+  logger.debug("Closing Channel.")
   channel.close()
   logger.debug("Closed connections.")
 
