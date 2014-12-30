@@ -6,6 +6,7 @@
 import logging
 
 import __main__ as main
+import os, pwd
 
 LOG_LEVEL = logging.INFO
 
@@ -20,7 +21,10 @@ CHUNK_SIZE = 4096
 NONCE_SIZE = 32
 PORT = 29977
 
-def get_file_logger(logger_name, filepath="/var/tmp/warp.log"):
+# Creates user specific log files.
+DEFAULT_LOG_FILE_NAME = "/var/tmp/" + "warp-" + pwd.getpwuid(os.getuid())[0] + ".log"
+
+def get_file_logger(logger_name, filepath=DEFAULT_LOG_FILE_NAME):
   """
   Returns a formatted logger that logs to a file and the console. Takes the
   logger name as a parameters and optional filepath.
