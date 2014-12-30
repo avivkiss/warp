@@ -9,7 +9,7 @@ class TransferManager:
   def __del__(self):
     pass
 
-  def is_file(self, filepath):
+  def isfile(self, filepath):
     return os.path.isfile(filepath)
 
   def get_file_hash(self, filepath, block_count=0):

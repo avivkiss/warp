@@ -43,6 +43,10 @@ class ClientTransferController:
     transfer_manager = self.server_channel.root.get_transfer_manager()
     if not self.recursive:
       try:
+        if not transfer_manager.isfile(self.file_dest):
+          file_name = os.path.split(self.file_src)[1]
+          self.file_dest = os.path.join(self.file_dest, file_name)
+
         transfer_agent = FileTransferAgent(ClientUDTManager(self.server_channel, self.hostname, self.tcp_mode), transfer_manager, self.file_src, self.file_dest, self.verify, False, self.stat)
         self.files_processed += 1
       except EOFError:
