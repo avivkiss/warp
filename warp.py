@@ -82,8 +82,6 @@ def main(remote_host, recursive, file_src, file_dest, tcp_mode, disable_verify, 
   controller.close()
   logger.debug("Closing Connection.")
   connection.close()
-  logger.debug("Closing Channel.")
-  channel.close()
   logger.debug("Closed connections.")
 
   gui.exit()

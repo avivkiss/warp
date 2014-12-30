@@ -7,7 +7,7 @@ two arguments...
 """
 
 from config import *
-from rpyc.utils.server import ThreadedServer
+from rpyc.utils.server import OneShotServer
 from common_tools import *
 import plac
 from server_transfer_controller import ServerTransferController
@@ -19,7 +19,7 @@ logger.propagate = True
 
 def main():
   os.chdir(expanduser("~"))
-  server = ThreadedServer(ServerTransferController, hostname='localhost', port=0, protocol_config={"allow_public_attrs": True})
+  server = OneShotServer(ServerTransferController, hostname='localhost', port=0, protocol_config={"allow_public_attrs": True})
   sys.stderr.write(str(server.port))
   sys.stderr.write('     ')
   server.start()

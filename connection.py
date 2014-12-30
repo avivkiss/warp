@@ -55,8 +55,8 @@ class Connection:
     return self.channel
 
   def close(self):
-    pass
-    # self.forward_thread.exit()
+    logger.debug("Closing Channel.")
+    self.channel.close()
 
   @staticmethod
   def unpack_remote_host(remote_host):

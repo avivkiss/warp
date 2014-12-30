@@ -2,7 +2,6 @@
 from config import *
 from common_tools import *
 
-
 class TransferManager:
   def __init__(self):
     pass
