@@ -12,6 +12,9 @@ class TransferManager:
   def isfile(self, filepath):
     return os.path.isfile(filepath)
 
+  def isdir(self, filepath):
+    return os.path.isdir(filepath)
+
   def get_file_hash(self, filepath, block_count=0):
     return getHash(filepath, block_count)
 

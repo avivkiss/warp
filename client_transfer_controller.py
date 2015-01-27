@@ -43,7 +43,7 @@ class ClientTransferController:
     transfer_manager = self.server_channel.root.get_transfer_manager()
     if not self.recursive:
       try:
-        if not transfer_manager.isfile(self.file_dest):
+        if transfer_manager.isdir(self.file_dest):
           file_name = os.path.split(self.file_src)[1]
           self.file_dest = os.path.join(self.file_dest, file_name)
 
