@@ -79,11 +79,13 @@ class Handler (SocketServer.BaseRequestHandler):
                     break
                 self.request.send(data)
 
-        peername = self.request.getpeername()
-        chan.close()
-        self.request.close()
-        verbose('Tunnel closed from %r' % (peername,))
-
+        try:
+          peername = self.request.getpeername()
+          chan.close()
+          self.request.close()
+          verbose('Tunnel closed from %r' % (peername,))
+        except:
+          pass
 
 def forward_tunnel(local_port, remote_host, remote_port, transport):
     # this is a little convoluted, but lets me configure things for the Handler
